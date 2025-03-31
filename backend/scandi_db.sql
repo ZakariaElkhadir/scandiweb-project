@@ -1,38 +1,70 @@
--- MySQL script to create the database and tables for Scandiweb project
--- you can run this script with cat scandi_db.sql | mysql -u root -p
+-- This SQL script creates the database and tables for the Scandiweb project.
+--  You can run this script cat scandi_db.sql | mysql -u root -p
+
+
+CREATE DATABASE IF NOT EXISTS scandiweb_db;
 USE scandiweb_db;
 
--- this is the categories collection
+-- Categories Table
 CREATE TABLE IF NOT EXISTS categories (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) UNIQUE NOT NULL
+    name VARCHAR(255) PRIMARY KEY
 );
 
--- this is the products collection
+-- Brands Table
+CREATE TABLE IF NOT EXISTS brands (
+    name VARCHAR(255) PRIMARY KEY
+);
+
+-- Products Table
 CREATE TABLE IF NOT EXISTS products (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id VARCHAR(255) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    in_stock BOOLEAN DEFAULT TRUE,
+    in_stock BOOLEAN NOT NULL,
     description TEXT,
-    category_id INT,
-    brand VARCHAR(100),
-    price DECIMAL(10,2) NOT NULL,
-    currency VARCHAR(10),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
+    category_name VARCHAR(255),
+    brand_name VARCHAR(255),
+    FOREIGN KEY (category_name) REFERENCES categories(name),
+    FOREIGN KEY (brand_name) REFERENCES brands(name)
 );
 
-CREATE TABLE IF NOT EXISTS product_attributes (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    product_id INT,
-    name VARCHAR(100),
-    value VARCHAR(100),
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
-);
-
+-- Product Images Table
 CREATE TABLE IF NOT EXISTS product_images (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    product_id INT,
+    product_id VARCHAR(255),
     image_url TEXT,
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+-- Currencies Table
+CREATE TABLE IF NOT EXISTS currencies (
+    label VARCHAR(3) PRIMARY KEY,
+    symbol VARCHAR(5) NOT NULL
+);
+
+-- Prices Table
+CREATE TABLE IF NOT EXISTS prices (
+    product_id VARCHAR(255),
+    amount DECIMAL(10,2) NOT NULL,
+    currency_label VARCHAR(3),
+    PRIMARY KEY (product_id, currency_label),
+    FOREIGN KEY (product_id) REFERENCES products(id),
+    FOREIGN KEY (currency_label) REFERENCES currencies(label)
+);
+
+-- Attribute Sets Table
+CREATE TABLE IF NOT EXISTS attribute_sets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id VARCHAR(255),
+    name VARCHAR(255) NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+-- Attribute Items Table
+CREATE TABLE IF NOT EXISTS attribute_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    attribute_set_id INT,
+    display_value VARCHAR(255) NOT NULL,
+    value VARCHAR(255) NOT NULL,
+    FOREIGN KEY (attribute_set_id) REFERENCES attribute_sets(id)
 );
