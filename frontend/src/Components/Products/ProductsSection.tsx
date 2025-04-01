@@ -6,8 +6,12 @@ interface Product {
   name: string;
   price: number;
   images: string;
+  category_name: string;
 }
-const ProductsSection = () => {
+interface ProductsSectionProps {
+  activeCategory: string;
+}
+const ProductsSection = ({activeCategory}: ProductsSectionProps) => {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -27,11 +31,18 @@ const ProductsSection = () => {
   if (loading) {
     return <p>Loading products...</p>;
   }
+  const filteredProducts =
+  activeCategory.toLowerCase() === "all"
+    ? products
+    : products.filter(
+        (product) =>
+          product.category_name.toLowerCase() === activeCategory.toLowerCase()
+      );
   return (
     <section className="mr-22 ml-22">
-      <h2 className="text-2xl">collection</h2>
+      <h2 className="text-2xl">{activeCategory}</h2>
       <div className="mt-9 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {products.map((product) => (
+        {filteredProducts.map((product) => (
           <ProductsCard
           key={product.id}
           name={product.name}
