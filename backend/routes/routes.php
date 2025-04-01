@@ -6,6 +6,19 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 $router = new \Bramus\Router\Router();
 
+// CORS Middleware
+$router->before('GET|POST|OPTIONS', '/.*', function () {
+    header("Access-Control-Allow-Origin: *");
+    header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+    header("Access-Control-Allow-Headers: Content-Type, Authorization");
+
+    // Handle preflight OPTIONS request
+    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        http_response_code(200);
+        exit;
+    }
+});
+
 // routes
 $router->get('/api/products', function() {
     $controller = new \Controllers\ProductsController();
