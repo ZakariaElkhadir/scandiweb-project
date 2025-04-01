@@ -1,11 +1,14 @@
-import './App.css'
+import Header from "./Components/Header"
+import ProductsSection from "./Components/Products/ProductsSection"
 
 function App() {
-  
 
   return (
     <>
-      <h1 className='text-3xl font-bold underline'>hello </h1>
+     <Header />
+     <main className="container pt-20 "> 
+      <ProductsSection />
+     </main>
     </>
   )
 }
