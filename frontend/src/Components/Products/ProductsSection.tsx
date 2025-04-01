@@ -13,7 +13,7 @@ const ProductsSection = () => {
 
   useEffect(() => {
     axios
-    .get<Product[]>(process.env.vite_APP_API_URL || 'http://localhost:8000/api/products')
+    .get<Product[]>(import.meta.env.VITE_APP_API_URL || 'http://localhost:8000/api/products')
     .then((response: { data: Product[] }) => {
       console.log("Products fetched successfully:", response.data)
       setProducts(response.data)
