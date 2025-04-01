@@ -7,6 +7,7 @@ interface Product {
   price: number;
   images: string;
   category_name: string;
+  in_stock: string;
 }
 interface ProductsSectionProps {
   activeCategory: string;
@@ -48,6 +49,7 @@ const ProductsSection = ({activeCategory}: ProductsSectionProps) => {
           name={product.name}
           price={Number(product.price).toFixed(2)} // Convert price to a number
           imageUrl={product.images}
+          inStock={product.in_stock}
           />
         ))}
       </div>
