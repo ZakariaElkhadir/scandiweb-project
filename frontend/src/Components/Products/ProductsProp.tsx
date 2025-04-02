@@ -8,7 +8,7 @@ interface ProductProps {
   name: string;
   price: string;
   onAddToCart?: () => void;
-  inStock?: string | number;
+  inStock?:  number;
 }
 
 const ProductsCard = ({ name, price, imageUrl, inStock }: ProductProps) => {
@@ -23,7 +23,7 @@ const ProductsCard = ({ name, price, imageUrl, inStock }: ProductProps) => {
           alt={name}
           className="w-full h-full object-contain hover:scale-105 transition-transform duration-300"
         />
-        {inStock == 0 && (
+        {inStock === 0 && (
           <span
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
              bg-red-600  text-white px-2 py-1 rounded"
@@ -33,12 +33,15 @@ const ProductsCard = ({ name, price, imageUrl, inStock }: ProductProps) => {
         )}
       </div>
       <div className="relative -mt-8 mb-3 flex justify-end">
-        <button
+       {inStock !== undefined && inStock > 0 && (
+          <button
           onClick={onAddToCart}
           className="w-10 h-10 rounded-full bg-[#5ECE7B] flex justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         >
           <ShoppingCart width={20} color="white" />
         </button>
+       )}
+        
       </div>
       <h4 className="text-lg font-medium text-gray-800 mb-1 truncate">
         {name}
