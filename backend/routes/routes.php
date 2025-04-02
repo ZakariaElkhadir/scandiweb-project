@@ -1,5 +1,5 @@
 <?php
-use Controllers\ProductsController;
+use Controller\ProductsController;
 
 // Load Composer autoloader (better than manual requires)
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -21,7 +21,7 @@ $router->before('GET|POST|OPTIONS', '/.*', function () {
 
 // routes
 $router->get('/api/products', function() {
-    $controller = new \Controllers\ProductsController();
+    $controller = new ProductsController();
     $controller->getAllProduct();
 });
 

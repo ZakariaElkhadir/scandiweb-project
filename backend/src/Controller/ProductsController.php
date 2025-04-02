@@ -1,5 +1,5 @@
 <?php
-namespace Controllers;
+namespace Controller;
 
 use Models\Products\Product;
 
