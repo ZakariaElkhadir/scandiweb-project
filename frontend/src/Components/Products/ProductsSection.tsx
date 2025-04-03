@@ -1,6 +1,7 @@
 import ProductsCard from "./ProductsProp";
-import { useEffect, useState } from "react";
-import axios from "axios";
+
+import { gql, useQuery } from "@apollo/client";
+
 interface Product {
   id: number;
   name: string;
@@ -9,28 +10,42 @@ interface Product {
   category_name: string;
   in_stock: string;
 }
+interface GetProductsData {
+  products: Product[];
+}
 interface ProductsSectionProps {
   activeCategory: string;
 }
 const ProductsSection = ({ activeCategory }: ProductsSectionProps) => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    axios
-      .get<Product[]>(
-        import.meta.env.VITE_APP_API_URL || "http://localhost:8000/api/products"
-      )
-      .then((response: { data: Product[] }) => {
-        console.log("Products fetched successfully:", response.data);
-        setProducts(response.data);
-        setLoading(false);
-      })
-      .catch((error: unknown) => {
-        console.error("Error fetching products:", error);
-        setLoading(false);
-      });
-  }, []);
+  const GET_PRODUCTS = gql`
+    query GetProductsQuery {
+      products {
+        id
+        name
+        price
+        images
+        category_name
+        in_stock
+      }
+    }
+  `;
+  const { loading, error, data } = useQuery<GetProductsData>(GET_PRODUCTS);
+  // useEffect(() => {
+  //   axios
+  //     .get<Product[]>(
+  //       import.meta.env.VITE_APP_API_URL || "http://localhost:8000/api/products"
+  //     )
+  //     .then((response: { data: Product[] }) => {
+  //       console.log("Products fetched successfully:", response.data);
+  //       setProducts(response.data);
+  //       setLoading(false);
+  //     })
+  //     .catch((error: unknown) => {
+  //       console.error("Error fetching products:", error);
+  //       setLoading(false);
+  //     });
+  // }, []);
+  //--- Loading State ---
   if (loading) {
     return (
       <div role="status" className="flex justify-center items-center h-screen">
@@ -54,6 +69,19 @@ const ProductsSection = ({ activeCategory }: ProductsSectionProps) => {
       </div>
     );
   }
+  // --- Error State ---
+  if (error) {
+    console.error("Error fetching products:", error);
+    return (
+      <div className="text-center text-red-500 p-4">
+        Error loading products. Please try again later.
+        <pre className="text-xs text-left whitespace-pre-wrap">
+          {error.message}
+        </pre>
+      </div>
+    );
+  }
+  const products = data?.products ?? [];
   const filteredProducts =
     activeCategory.toLowerCase() === "all"
       ? products
@@ -63,22 +91,34 @@ const ProductsSection = ({ activeCategory }: ProductsSectionProps) => {
         );
   return (
     <section className="mr-22 ml-22">
-      <h2 className="text-2xl">{activeCategory}</h2>
+      <h2 className="text-2xl capitalize">{activeCategory}</h2>
       <div className="mt-9 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {filteredProducts.map((product) => (
-          <ProductsCard
-            key={product.id}
-            name={product.name}
-            price={Number(product.price).toFixed(2)}
-            imageUrl={product.images}
-            inStock={Number(product.in_stock)}
-          />
-        ))}
-        {filteredProducts.length === 0 && (
-          <div className="col-span-4 text-center">
-            <p className="text-gray-500">No products found in this category.</p>
-          </div>
-        )}
+        {filteredProducts.length > 0
+          ? filteredProducts.map((product) => (
+              <ProductsCard
+                key={product.id}
+                name={product.name}
+                price={Number(product.price).toFixed(2)}
+                imageUrl={product.images}
+                inStock={Number(product.in_stock)}
+              />
+            ))
+          : activeCategory.toLowerCase() !== "all" && (
+              <div className="col-span-full text-center py-10">
+                <p className="text-gray-500">
+                  No products found in the "{activeCategory}" category.
+                </p>
+              </div>
+            )}
+        {products.length === 0 &&
+          activeCategory.toLowerCase() === "all" &&
+          !loading && (
+            <div className="col-span-full text-center py-10">
+              <p className="text-gray-500">
+                No products available at the moment.
+              </p>
+            </div>
+          )}
       </div>
     </section>
   );

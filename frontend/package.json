@@ -10,8 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@apollo/client": "^3.13.5",
     "@tailwindcss/vite": "^4.0.17",
     "axios": "^1.8.4",
+    "graphql": "^16.10.0",
+    "graphql-request": "^7.1.2",
     "lucide-react": "^0.486.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
