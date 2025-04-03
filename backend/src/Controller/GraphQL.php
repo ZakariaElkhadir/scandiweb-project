@@ -14,6 +14,11 @@ class GraphQL
 {
     static public function handle()
     {
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            http_response_code(204);
+            exit;
+        }
         try {
             $queryType = new ObjectType([
                 'name' => 'Query',
