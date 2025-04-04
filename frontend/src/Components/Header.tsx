@@ -1,6 +1,7 @@
 import logo from "../assets/logo.png";
 import { ShoppingCart } from "lucide-react";
-
+import Cart from "./Cart";
+import { useState } from "react";
 
 interface HeaderProps {
   activeCategory: string;
@@ -15,6 +16,7 @@ interface HeaderProps {
 
 const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
   const categories = ["All", "Clothes", "Tech"];
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   return (
     <header className="bg-white h-16 relative w-full">
@@ -48,10 +50,20 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
         </div>
 
         {/* Cart button */}
-        <button className="text-gray-700 hover:text-gray-900 cursor-pointer">
+        <button
+          className="text-gray-700 hover:text-gray-900 cursor-pointer"
+          data-testid="cart-btn"
+          onClick={() => {
+            setIsCartOpen(!isCartOpen);
+          }}
+        >
           <ShoppingCart />
         </button>
       </div>
+      {isCartOpen && (
+    
+          <Cart />
+      )}
     </header>
   );
 };

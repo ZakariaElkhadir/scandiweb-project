@@ -14,7 +14,7 @@ class GraphQL
 {
     static public function handle()
     {
-        
+
         if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
             http_response_code(204);
             exit;
@@ -23,25 +23,52 @@ class GraphQL
             $queryType = new ObjectType([
                 'name' => 'Query',
                 'fields' => [
-                    'echo' => [
-                        'type' => Type::string(),
-                        'args' => [
-                            'message' => ['type' => Type::string()],
-                        ],
-                        'resolve' => fn($rootValue, array $args): string => $rootValue['prefix'] . $args['message'],
-                    ],
                     'products' => [
-                        'type' => Type::listOf(new ObjectType([
-                            'name' => 'Product',
-                            'fields' => [
-                                'id' => Type::string(),
-                                'name' => Type::string(),
-                                'price' => Type::float(),
-                                'images' => Type::string(),
-                                'category_name' => Type::string(),
-                                'in_stock' => Type::int(),
-                            ],
-                        ])),
+                        // This returns a list of Product objects (AbstractProduct subclasses)
+                        'type' => Type::listOf(
+                            new ObjectType([
+                                'name' => 'Product',
+                                'fields' => [
+                                    'id' => [
+                                        'type' => Type::id(),
+                                        'resolve' => function ($root) {
+                                            return $root->getDetails()['id'];
+                                        }
+                                    ],
+                                    'name' => [
+                                        'type' => Type::string(),
+                                        'resolve' => function ($root) {
+                                            // Either use getDetails() or direct properties
+                                            return $root->getDetails()['name'];
+                                        }
+                                    ],
+                                    'price' => [
+                                        'type' => Type::float(),
+                                        'resolve' => function ($root) {
+                                            return $root->getDetails()['price'];
+                                        }
+                                    ],
+                                    'images' => [
+                                        'type' => Type::listOf(Type::string()),
+                                        'resolve' => function ($root) {
+                                            return $root->getDetails()['images'];
+                                        }
+                                    ],
+                                    'category_name' => [
+                                        'type' => Type::string(),
+                                        'resolve' => function ($root) {
+                                            return $root->getDetails()['category_name'];
+                                        }
+                                    ],
+                                    'in_stock' => [
+                                        'type' => Type::int(),
+                                        'resolve' => function ($root) {
+                                            return $root->getDetails()['in_stock'];
+                                        }
+                                    ]
+                                ]
+                            ])
+                        ),
                         'resolve' => function () {
                             $product = new \Models\Products\Product();
                             return $product->getAllProducts();

@@ -6,7 +6,7 @@ interface Product {
   id: number;
   name: string;
   price: number;
-  images: string;
+  images: string[]; 
   category_name: string;
   in_stock: string;
 }
@@ -96,10 +96,10 @@ const ProductsSection = ({ activeCategory }: ProductsSectionProps) => {
         {filteredProducts.length > 0
           ? filteredProducts.map((product) => (
               <ProductsCard
-                key={product.id}
+              key={product.id}
                 name={product.name}
                 price={Number(product.price).toFixed(2)}
-                imageUrl={product.images}
+                imageUrl={product.images?.[0] ?? "default.jpg"} 
                 inStock={Number(product.in_stock)}
               />
             ))
