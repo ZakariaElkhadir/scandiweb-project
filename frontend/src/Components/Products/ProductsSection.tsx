@@ -9,6 +9,10 @@ interface Product {
   images: string[]; 
   category_name: string;
   in_stock: string;
+  currency: {
+    label: string;
+    symbol: string;
+  };
 }
 interface GetProductsData {
   products: Product[];
@@ -26,6 +30,9 @@ const ProductsSection = ({ activeCategory }: ProductsSectionProps) => {
         images
         category_name
         in_stock
+        currency{
+        label
+        symbol}
       }
     }
   `;
@@ -96,18 +103,18 @@ const ProductsSection = ({ activeCategory }: ProductsSectionProps) => {
         {filteredProducts.length > 0
           ? filteredProducts.map((product) => (
               <ProductsCard
-              key={product.id}
-                name={product.name}
-                price={Number(product.price).toFixed(2)}
-                imageUrl={product.images?.[0] ?? "default.jpg"} 
-                inStock={Number(product.in_stock)}
+          key={product.id}
+          name={product.name}
+          price={`${product.currency.symbol}${Number(product.price).toFixed(2)}`}
+          imageUrl={product.images?.[0] ?? "default.jpg"} 
+          inStock={Number(product.in_stock)}
               />
             ))
           : activeCategory.toLowerCase() !== "all" && (
               <div className="col-span-full text-center py-10">
-                <p className="text-gray-500">
-                  No products found in the "{activeCategory}" category.
-                </p>
+          <p className="text-gray-500">
+            No products found in the "{activeCategory}" category.
+          </p>
               </div>
             )}
         {products.length === 0 &&

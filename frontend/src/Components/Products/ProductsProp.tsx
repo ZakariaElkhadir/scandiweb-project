@@ -9,6 +9,7 @@ interface ProductProps {
   price: string;
   onAddToCart?: () => void;
   inStock?:  number;
+  currency?: string;
 }
 
 const ProductsCard = ({ name, price, imageUrl, inStock }: ProductProps) => {
