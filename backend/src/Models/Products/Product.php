@@ -17,6 +17,8 @@ abstract class AbstractProduct
     protected array $images;
     protected string $categoryName;
     protected int $inStock;
+    protected string $currencyLabel;
+    protected string $currencySymbol;
 
     public function __construct(
         string $id,
@@ -24,7 +26,9 @@ abstract class AbstractProduct
         float $price,
         array $images,
         string $categoryName,
-        int $inStock
+        int $inStock,
+        string $currencyLabel,
+        string $currencySymbol 
     ) {
         $this->id = $id;
         $this->name = $name;
@@ -32,6 +36,8 @@ abstract class AbstractProduct
         $this->images = $images;
         $this->categoryName = $categoryName;
         $this->inStock = $inStock;
+        $this->currencyLabel = $currencyLabel;
+        $this->currencySymbol = $currencySymbol;
     }
 
     abstract public function getDetails(): array;
@@ -53,7 +59,10 @@ class TechProduct extends AbstractProduct
             'images' => $this->images,
             'category_name' => $this->categoryName,
             'in_stock' => $this->inStock,
-            'specifications' => 'Example for Tech',
+            'currency' => [
+                'label' => $this->currencyLabel,
+                'symbol' => $this->currencySymbol,
+            ],
         ];
     }
 }
@@ -75,6 +84,10 @@ class ClothesProduct extends AbstractProduct
             'category_name' => $this->categoryName,
             'in_stock' => $this->inStock,
             'sizes' => ['S', 'M', 'L'],
+            'currency' => [
+                'label' => $this->currencyLabel,
+                'symbol' => $this->currencySymbol,
+            ],
         ];
     }
 }
@@ -108,7 +121,9 @@ class ProductFactory
             // Split images on comma, handle null gracefully
             explode(',', $row['images'] ?? ''),
             $row['category_name'] ?? 'unknown',
-            (int) ($row['in_stock'] ?? 0)
+            (int) ($row['in_stock'] ?? 0),
+            $row['currency'] ?? 'USD',
+            $row['currency_symbol'] ?? '$'
         );
     }
 }
@@ -147,6 +162,7 @@ class Product
         // Create polymorphic product objects
         $products = [];
         foreach ($rows as $row) {
+            error_log(print_r($row, true));
             $products[] = ProductFactory::create($row);
         }
 

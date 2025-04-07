@@ -48,6 +48,30 @@ class GraphQL
                                             return $root->getDetails()['price'];
                                         }
                                     ],
+                                    'currency' => [
+                                        'type' => new ObjectType([
+                                            'name' => 'currencies',
+                                            'fields' => [
+                                                'label' => [
+                                                    'type' => Type::string(),
+                                                    'resolve' => function ($root) {
+                                                        return $root['label'];
+                                                    }
+                                                ],
+                                                'symbol' => [
+                                                    'type' => Type::string(),
+                                                    'resolve' => function ($root) {
+                                                        return $root['symbol'];
+                                                    }
+                                                ],
+                                            ]
+                                        ]),
+                                        'resolve' => function ($root) {
+                                            $details = $root->getDetails();
+                                            error_log(print_r($details, true)); // Debugging: Log the details
+                                            return $details['currency'];
+                                        }
+                                    ],
                                     'images' => [
                                         'type' => Type::listOf(Type::string()),
                                         'resolve' => function ($root) {
