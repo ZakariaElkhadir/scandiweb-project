@@ -23,6 +23,42 @@ class GraphQL
             $queryType = new ObjectType([
                 'name' => 'Query',
                 'fields' => [
+                    'product' => [
+                        'type' => new ObjectType([
+                            'name' => 'ProductDetails',
+                            'fields' => [
+                                'id' => Type::id(),
+                                'name' => Type::string(),
+                                'description' => Type::string(),
+                                'brand' => Type::string(),
+                                'price' => Type::float(),
+                                'currency' => new ObjectType([
+                                    'name' => 'Currency',
+                                    'fields' => [
+                                        'label' => Type::string(),
+                                        'symbol' => Type::string(),
+                                    ],
+                                ]),
+                                'images' => Type::listOf(Type::string()),
+                                'attributes' => Type::listOf(new ObjectType([
+                                    'name' => 'Attribute',
+                                    'fields' => [
+                                        'key' => Type::string(),
+                                        'value' => Type::string(),
+                                    ],
+                                ])),
+                                'in_stock' => Type::int(),
+                            ],
+                        ]),
+                        'args' => [
+                            'id' => Type::nonNull(Type::string()),
+                        ],
+                        'resolve' => function ($root, $args) {
+                            $product = new \Models\Products\Product();
+                            return $product->getProductDetails($args['id']);
+                        },
+                    ],
+
                     'products' => [
                         // This returns a list of Product objects (AbstractProduct subclasses)
                         'type' => Type::listOf(
