@@ -104,6 +104,7 @@ const ProductsSection = ({ activeCategory }: ProductsSectionProps) => {
           ? filteredProducts.map((product) => (
               <ProductsCard
           key={product.id}
+          id={product.id.toString()}
           name={product.name}
           price={`${product.currency.symbol}${Number(product.price).toFixed(2)}`}
           imageUrl={product.images?.[0] ?? "default.jpg"} 
