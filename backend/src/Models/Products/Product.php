@@ -142,7 +142,7 @@ class Product
 
     public function getAllProducts(): array
     {
-        $query = "F
+        $query = "
             SELECT
                 p.*,
                 GROUP_CONCAT(pi.image_url) AS images,
