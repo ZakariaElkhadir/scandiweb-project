@@ -1,5 +1,6 @@
 import Header from "./Components/Header"
-import ProductsSection from "./Components/Products/ProductsSection"
+import ProductPage from "./Components/Products/productPage";
+import ProductsSection from "./Components/Products/ProductsSection";
 import { useState } from "react"
 
 function App() {
@@ -9,7 +10,9 @@ function App() {
     <>
      <Header activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
      <main className="container pt-20 "> 
-      <ProductsSection activeCategory={activeCategory}/>
+      {/* <ProductsSection activeCategory={activeCategory}/> */}
+      <ProductPage productId="apple-airtag" />
+
      </main>
     </>
   )
