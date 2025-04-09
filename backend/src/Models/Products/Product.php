@@ -178,9 +178,21 @@ class Product
             c.symbol AS currency_symbol,
             pr.amount AS price,
             b.name AS brand_name,
-            GROUP_CONCAT(
-                CONCAT(ai.display_value, ':', ai.value)
-                SEPARATOR '|'
+            JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    'name', ats.name,
+                    'type', ats.type,
+                    'items', (
+                        SELECT JSON_ARRAYAGG(
+                            JSON_OBJECT(
+                                'display_value', ai.display_value,
+                                'value', ai.value
+                            )
+                        )
+                        FROM attribute_items ai
+                        WHERE ai.attribute_set_id = ats.id
+                    )
+                )
             ) AS attributes
         FROM products p
         LEFT JOIN product_images pi ON p.id = pi.product_id
@@ -188,7 +200,6 @@ class Product
         LEFT JOIN currencies c ON pr.currency_label = c.label
         LEFT JOIN brands b ON p.brand_name = b.name
         LEFT JOIN attribute_sets ats ON p.id = ats.product_id
-        LEFT JOIN attribute_items ai ON ats.id = ai.attribute_set_id
         WHERE p.id = ?
         GROUP BY p.id, c.label, c.symbol, pr.amount, b.name
     ";
@@ -203,15 +214,6 @@ class Product
             return null;
         }
 
-        // Parse attributes into a structured array
-        $attributes = [];
-        if (!empty($row['attributes'])) {
-            foreach (explode('|', $row['attributes']) as $attribute) {
-                [$key, $value] = explode(':', $attribute);
-                $attributes[$key] = $value;
-            }
-        }
-
         return [
             'id' => $row['id'],
             'name' => $row['name'],
@@ -223,8 +225,10 @@ class Product
                 'symbol' => $row['currency_symbol'],
             ],
             'images' => explode(',', $row['images']),
-            'attributes' => $attributes,
+            'attributes' => json_decode($row['attributes'], true),
             'in_stock' => $row['in_stock'],
         ];
     }
+
+
 }

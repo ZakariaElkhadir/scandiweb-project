@@ -43,8 +43,15 @@ class GraphQL
                                 'attributes' => Type::listOf(new ObjectType([
                                     'name' => 'Attribute',
                                     'fields' => [
-                                        'key' => Type::string(),
-                                        'value' => Type::string(),
+                                        'name' => Type::string(),
+                                        'type' => Type::string(),
+                                        'items' => Type::listOf(new ObjectType([
+                                            'name' => 'AttributeItem',
+                                            'fields' => [
+                                                'display_value' => Type::string(),
+                                                'value' => Type::string(),
+                                            ],
+                                        ])),
                                     ],
                                 ])),
                                 'in_stock' => Type::int(),
