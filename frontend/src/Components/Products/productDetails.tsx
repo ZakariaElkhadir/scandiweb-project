@@ -15,7 +15,8 @@ interface ProductDetailsProps {
       symbol: string;
     };
     price: number;
-    description: string; // This contains HTML content
+    description: string; 
+    in_stock: number;
   };
 }
 
@@ -23,6 +24,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
+  console.log(product);
 
   // Find size and color attributes
   const sizeAttribute = product.attributes.find(attr => attr.name === 'Size');
@@ -112,11 +114,16 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
         
         {/* Add to cart button */}
         <button 
-          className="w-full bg-green-500 text-white py-3 px-4 mt-4 hover:bg-green-600 transition"
-          data-testid="add-to-cart"
-        >
-          ADD TO CART
-        </button>
+  className={`w-full py-3 px-4 mt-4 transition ${
+    (product.in_stock ?? 0) > 0 
+      ? 'bg-green-500 text-white hover:bg-green-600' 
+      : 'bg-gray-400 text-gray-700 cursor-not-allowed'
+  }`}
+  data-testid="add-to-cart"
+  disabled={(product.in_stock ?? 0) <= 0}
+>
+  {(product.in_stock ?? 0) > 0 ? 'ADD TO CART' : 'OUT OF STOCK'}
+</button>
         
         {/* Product description */}
         <div 

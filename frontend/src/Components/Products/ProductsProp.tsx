@@ -42,20 +42,23 @@ const ProductsCard = ({
           />
           
           {/* Cart button that appears on hover */}
-          <button 
-            onClick={handleAddToCart}
-            className="absolute z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 
-                     -bottom-2 right-1 transform -translate-x-1/2 
-                     bg-green-500 hover:bg-green-600 text-white 
-                     rounded-full w-10 h-10 flex items-center justify-center"
-            aria-label="Add to cart"
-          >
-           <ShoppingCart 
-            className="w-6 h-6" 
-            strokeWidth={1.5}  
-            
-         />
-          </button>
+            {inStock !== undefined && inStock > 0 && (
+            <button
+              onClick={handleAddToCart}
+              className="absolute z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 
+                   -bottom-2 right-1 transform translate-x-1/2 
+                   bg-green-500 hover:bg-green-600 text-white 
+                   rounded-full w-10 h-10 flex items-center justify-center shadow-lg"
+              aria-label="Add to cart"
+            >
+              <ShoppingCart 
+              className="w-6 h-6" 
+              strokeWidth={1.5} 
+              />
+            </button>
+            )}
+          
+          {/* Out of Stock Badge */}
           
           {inStock === 0 && (
             <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 text-white px-2 py-1 rounded">
