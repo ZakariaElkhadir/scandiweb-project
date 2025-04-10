@@ -15,7 +15,7 @@ interface ProductDetailsProps {
       symbol: string;
     };
     price: number;
-    description: string;
+    description: string; // This contains HTML content
   };
 }
 
@@ -119,12 +119,11 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
         </button>
         
         {/* Product description */}
-        <p 
-          className="text-xs text-gray-500 mt-6"
+        <div 
+          className="text-xs prose text-gray-500 mt-6"
           data-testid="product-description"
-        >
-          {product.description}
-        </p>
+          dangerouslySetInnerHTML={{ __html: product.description }} // Render HTML content
+        />
       </div>
     </div>
   );

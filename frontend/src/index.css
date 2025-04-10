@@ -4,3 +4,26 @@ body, h1, h2, h3, h4, h5, h6, p, ul, ol {
   margin: 0;
   padding: 0;
 }
+ @layer base {
+  h3 {
+    @apply text-lg font-semibold mb-2;
+  }
+  h1 {
+    @apply text-2xl font-bold mb-4;
+  }
+  h2 {
+    @apply text-xl font-bold mb-3;
+  }
+  h4 {
+    @apply text-md font-medium mb-2;
+  }
+  p {
+    @apply text-gray-500 mb-4;
+  }
+  ul {
+    @apply list-disc pl-5 mb-4;
+  }
+  li {
+    @apply mb-2;
+  }
+ }
