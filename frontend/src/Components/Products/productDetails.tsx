@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 interface ProductDetailsProps {
   product: {
@@ -15,20 +15,36 @@ interface ProductDetailsProps {
       symbol: string;
     };
     price: number;
-    description: string; 
+    description: string;
     in_stock: number;
   };
 }
 
 const ProductDetails = ({ product }: ProductDetailsProps) => {
   const [selectedImage, setSelectedImage] = useState(0);
-  const [selectedSize, setSelectedSize] = useState('');
-  const [selectedColor, setSelectedColor] = useState('');
-  console.log(product);
+  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
+  const [hoveredSizeIndex, setHoveredSizeIndex] = useState<number | null>(null);
 
   // Find size and color attributes
-  const sizeAttribute = product.attributes.find(attr => attr.name === 'Size');
-  const colorAttribute = product.attributes.find(attr => attr.name === 'Color');
+  const sizeAttribute = product.attributes.find((attr) => attr.name === "Size");
+  const colorAttribute = product.attributes.find(
+    (attr) => attr.name === "Color"
+  );
+
+  //  abbreviated size label
+  const getSizeAbbreviation = (displayValue: string): string => {
+    const lowerValue = displayValue.toLowerCase();
+    if (lowerValue === "small") return "S";
+    if (lowerValue === "medium") return "M";
+    if (lowerValue === "large") return "L";
+    if (lowerValue === "extra large") return "XL";
+    if (lowerValue === "extra small") return "XS";
+    if (lowerValue === "2x large" || lowerValue === "xx large") return "2XL";
+    if (lowerValue === "3x large" || lowerValue === "xxx large") return "3XL";
+    // If no match, returning the original value
+    return displayValue;
+  };
 
   return (
     <div className="flex flex-col md:flex-row gap-8 max-w-6xl mx-auto p-4">
@@ -36,20 +52,26 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
       <div className="flex md:w-1/2" data-testid="product-gallery">
         <div className="flex flex-col gap-2 mr-2">
           {product.images.map((image, index) => (
-            <div 
-              key={index} 
-              className={`w-16 h-16 cursor-pointer border ${selectedImage === index ? 'border-black' : 'border-gray-200'}`}
+            <div
+              key={index}
+              className={`w-16 h-16 cursor-pointer border ${
+                selectedImage === index ? "border-black" : "border-gray-200"
+              }`}
               onClick={() => setSelectedImage(index)}
             >
-              <img src={image} alt={`${product.name} thumbnail ${index}`} className="w-full h-full object-cover" />
+              <img
+                src={image}
+                alt={`${product.name} thumbnail ${index}`}
+                className="w-full h-full object-cover"
+              />
             </div>
           ))}
         </div>
         <div className="flex-1 relative">
-          <img 
-            src={product.images[selectedImage]} 
-            alt={product.name} 
-            className="w-full object-cover" 
+          <img
+            src={product.images[selectedImage]}
+            alt={product.name}
+            className="w-full object-cover"
           />
         </div>
       </div>
@@ -57,37 +79,53 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
       {/* Right side - Product details */}
       <div className="md:w-1/2">
         <h1 className="text-2xl font-medium mb-6">{product.name}</h1>
-        
-        {/* Size selection */}
+
+        {/* Size selection - With popup hover effect */}
         {sizeAttribute && (
-          <div 
-            className="mb-4" 
-            data-testid={`product-attribute-${sizeAttribute.name.toLowerCase().replace(/\s+/g, '-')}`}
+          <div
+            className="mb-4"
+            data-testid={`product-attribute-${sizeAttribute.name
+              .toLowerCase()
+              .replace(/\s+/g, "-")}`}
           >
             <p className="text-sm font-medium uppercase mb-2">SIZE:</p>
             <div className="flex gap-2">
-              {sizeAttribute.items.map((item) => (
-                <button
-                  key={item.value}
-                  className={`w-10 h-10 flex items-center justify-center border ${
-                    selectedSize === item.value 
-                      ? 'border-black bg-black text-white' 
-                      : 'border-gray-300 hover:border-gray-500'
-                  }`}
-                  onClick={() => setSelectedSize(item.value)}
-                >
-                  {item.display_value}
-                </button>
+              {sizeAttribute.items.map((item, index) => (
+                <div key={item.value} className="relative">
+                  <button
+                    className={`w-10 h-10 flex items-center justify-center border text-sm font-medium ${
+                      selectedSize === item.value
+                        ? "border-black bg-black text-white"
+                        : "border-gray-300 hover:border-gray-500"
+                    }`}
+                    onClick={() => setSelectedSize(item.value)}
+                    onMouseEnter={() => setHoveredSizeIndex(index)}
+                    onMouseLeave={() => setHoveredSizeIndex(null)}
+                  >
+                    {getSizeAbbreviation(item.display_value)}
+                  </button>
+
+                  {/* Popup tooltip */}
+                  {hoveredSizeIndex === index && (
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded whitespace-nowrap">
+                      {item.display_value}
+                      {/* Arrow pointing down */}
+                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black"></div>
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
           </div>
         )}
-        
+
         {/* Color selection */}
         {colorAttribute && (
-          <div 
-            className="mb-4" 
-            data-testid={`product-attribute-${colorAttribute.name.toLowerCase().replace(/\s+/g, '-')}`}
+          <div
+            className="mb-4"
+            data-testid={`product-attribute-${colorAttribute.name
+              .toLowerCase()
+              .replace(/\s+/g, "-")}`}
           >
             <p className="text-sm font-medium uppercase mb-2">COLOR:</p>
             <div className="flex gap-2">
@@ -95,7 +133,9 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
                 <button
                   key={item.value}
                   className={`w-6 h-6 rounded-sm ${
-                    selectedColor === item.value ? 'ring-2 ring-black ring-offset-1' : ''
+                    selectedColor === item.value
+                      ? "ring-2 ring-black ring-offset-1"
+                      : ""
                   }`}
                   style={{ backgroundColor: item.value }}
                   onClick={() => setSelectedColor(item.value)}
@@ -105,31 +145,34 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
             </div>
           </div>
         )}
-        
+
         {/* Price */}
         <div className="mb-4">
           <p className="text-sm font-medium uppercase mb-2">PRICE:</p>
-          <p className="text-lg font-medium">{product.currency.symbol}{product.price.toFixed(2)}</p>
+          <p className="text-lg font-medium">
+            {product.currency.symbol}
+            {product.price.toFixed(2)}
+          </p>
         </div>
-        
+
         {/* Add to cart button */}
-        <button 
-  className={`w-full py-3 px-4 mt-4 transition ${
-    (product.in_stock ?? 0) > 0 
-      ? 'bg-green-500 text-white hover:bg-green-600' 
-      : 'bg-gray-400 text-gray-700 cursor-not-allowed'
-  }`}
-  data-testid="add-to-cart"
-  disabled={(product.in_stock ?? 0) <= 0}
->
-  {(product.in_stock ?? 0) > 0 ? 'ADD TO CART' : 'OUT OF STOCK'}
-</button>
-        
+        <button
+          className={`w-full py-3 px-4 mt-4 transition ${
+            (product.in_stock ?? 0) > 0
+              ? "bg-green-500 text-white hover:bg-green-600"
+              : "bg-gray-400 text-gray-700 cursor-not-allowed"
+          }`}
+          data-testid="add-to-cart"
+          disabled={(product.in_stock ?? 0) <= 0}
+        >
+          {(product.in_stock ?? 0) > 0 ? "ADD TO CART" : "OUT OF STOCK"}
+        </button>
+
         {/* Product description */}
-        <div 
+        <div
           className="text-xs prose text-gray-500 mt-6"
           data-testid="product-description"
-          dangerouslySetInnerHTML={{ __html: product.description }} // Render HTML content
+          dangerouslySetInnerHTML={{ __html: product.description }}
         />
       </div>
     </div>
