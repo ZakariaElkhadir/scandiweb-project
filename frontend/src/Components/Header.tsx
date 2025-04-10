@@ -2,6 +2,7 @@ import logo from "../assets/logo.png";
 import { ShoppingCart } from "lucide-react";
 import Cart from "./Cart";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 interface HeaderProps {
   activeCategory: string;
@@ -45,9 +46,13 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
         </div>
 
         {/* Logo */}
-        <div className="logo absolute left-1/2 transform -translate-x-1/2">
-          <img src={logo} alt="Logo" className="h-8" />
-        </div>
+        
+          <div className="logo absolute left-1/2 transform -translate-x-1/2">
+          <Link to="/"> {/* Wrap the logo in a Link component */}
+    <img src={logo} alt="Logo" className="h-8 cursor-pointer" />
+  </Link>
+          </div>
+        
 
         {/* Cart button */}
         <button

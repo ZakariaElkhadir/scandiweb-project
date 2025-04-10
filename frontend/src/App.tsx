@@ -9,6 +9,7 @@ function App() {
 
   return (
     <>
+     <Router>
       <Header
         activeCategory={activeCategory}
         setActiveCategory={setActiveCategory}
@@ -16,7 +17,7 @@ function App() {
       <main className="container pt-20 ">
         {/* <ProductsSection activeCategory={activeCategory}/> */}
         {/* <ProductPage productId="apple-airtag" /> */}
-        <Router>
+       
           <Routes>
             <Route
               path="/"
@@ -24,8 +25,9 @@ function App() {
             />
             <Route path="/product/:id" element={<ProductPage />} />
           </Routes>
-        </Router>
+        
       </main>
+      </Router>
     </>
   );
 }
