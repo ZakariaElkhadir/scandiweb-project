@@ -4,6 +4,7 @@ import { ShoppingCart } from "lucide-react";
  * Product Card displays: product image, name, price, and stock status
  * Product Price is formatted with 2 decimal places
  */
+
 interface ProductProps {
   id: string;
   imageUrl: string;
@@ -30,15 +31,21 @@ const ProductsCard = ({
       console.log("Add to cart clicked");
     }
   };
-  const kebabCase = (str: string) =>
-     str.toLowerCase().replace(/\s+/g, '-');
+
+  const kebabCase = (str: string) => str.toLowerCase().replace(/\s+/g, "-");
   return (
     <Link to={`/product/${id}`} className="block">
-      <div data-testid={`product-${kebabCase(name)}`} className="w-64 h-72 bg-white shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col p-2 cursor-pointer group">
+      <div
+        data-testid={`product-${kebabCase(name)}`}
+        className="w-64 h-72 bg-white shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col p-2 cursor-pointer group"
+      >
         <div className="relative overflow-visible h-48 w-full mb-3 flex items-center justify-center">
           <img
             src={imageUrl}
             alt={name}
+            onError={(e) => {
+              e.currentTarget.src = "../../assets/images/fallback.jpg"; // local fallback image
+            }}
             className={`w-full h-full object-contain group-hover:scale-105 transition-transform duration-300
               ${inStock === 0 ? "opacity-50 grayscale" : ""}`}
           />

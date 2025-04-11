@@ -6,7 +6,7 @@ interface Product {
   id: number;
   name: string;
   price: number;
-  images: string[]; 
+  images: string[];
   category_name: string;
   in_stock: string;
   currency: {
@@ -30,13 +30,15 @@ const ProductsSection = ({ activeCategory }: ProductsSectionProps) => {
         images
         category_name
         in_stock
-        currency{
-        label
-        symbol}
+        currency {
+          label
+          symbol
+        }
       }
     }
   `;
   const { loading, error, data } = useQuery<GetProductsData>(GET_PRODUCTS);
+
   // useEffect(() => {
   //   axios
   //     .get<Product[]>(
@@ -94,8 +96,10 @@ const ProductsSection = ({ activeCategory }: ProductsSectionProps) => {
       ? products
       : products.filter(
           (product) =>
-            product.category_name.toLowerCase() === activeCategory.toLowerCase()
+            product.category_name.toLowerCase() ===
+            activeCategory.toLowerCase(),
         );
+
   return (
     <section className="mr-22 ml-22">
       <h2 className="text-2xl capitalize">{activeCategory}</h2>
@@ -103,19 +107,19 @@ const ProductsSection = ({ activeCategory }: ProductsSectionProps) => {
         {filteredProducts.length > 0
           ? filteredProducts.map((product) => (
               <ProductsCard
-          key={product.id}
-          id={product.id.toString()}
-          name={product.name}
-          price={`${product.currency.symbol}${Number(product.price).toFixed(2)}`}
-          imageUrl={product.images?.[0] ?? "default.jpg"} 
-          inStock={Number(product.in_stock)}
+                key={product.id}
+                id={product.id.toString()}
+                name={product.name}
+                price={`${product.currency.symbol}${Number(product.price).toFixed(2)}`}
+                imageUrl={product.images?.[0] ?? "default.jpg"}
+                inStock={Number(product.in_stock)}
               />
             ))
           : activeCategory.toLowerCase() !== "all" && (
               <div className="col-span-full text-center py-10">
-          <p className="text-gray-500">
-            No products found in the "{activeCategory}" category.
-          </p>
+                <p className="text-gray-500">
+                  No products found in the "{activeCategory}" category.
+                </p>
               </div>
             )}
         {products.length === 0 &&
