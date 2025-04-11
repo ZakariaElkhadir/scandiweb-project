@@ -9,15 +9,15 @@ function App() {
 
   return (
     <>
-     <Router>
-      <Header
-        activeCategory={activeCategory}
-        setActiveCategory={setActiveCategory}
-      />
-      <main className="container pt-20 ">
-        {/* <ProductsSection activeCategory={activeCategory}/> */}
-        {/* <ProductPage productId="apple-airtag" /> */}
-       
+      <Router>
+        <Header
+          activeCategory={activeCategory}
+          setActiveCategory={setActiveCategory}
+        />
+        <main className="container pt-20 ">
+          {/* <ProductsSection activeCategory={activeCategory}/> */}
+          {/* <ProductPage productId="apple-airtag" /> */}
+
           <Routes>
             <Route
               path="/"
@@ -25,11 +25,9 @@ function App() {
             />
             <Route path="/product/:id" element={<ProductPage />} />
           </Routes>
-        
-      </main>
+        </main>
       </Router>
     </>
   );
 }
-
 export default App;

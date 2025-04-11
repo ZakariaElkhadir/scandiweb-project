@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ShoppingCart } from "lucide-react";
+import fallbackImage from "../../assets/images/fallback.jpg";
 /**
  * Product Card displays: product image, name, price, and stock status
  * Product Price is formatted with 2 decimal places
@@ -44,7 +45,7 @@ const ProductsCard = ({
             src={imageUrl}
             alt={name}
             onError={(e) => {
-              e.currentTarget.src = "../../assets/images/fallback.jpg"; // local fallback image
+              e.currentTarget.src = fallbackImage; // local fallback image
             }}
             className={`w-full h-full object-contain group-hover:scale-105 transition-transform duration-300
               ${inStock === 0 ? "opacity-50 grayscale" : ""}`}
@@ -55,7 +56,7 @@ const ProductsCard = ({
             <button
               onClick={handleAddToCart}
               className="absolute z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300
-                   -bottom-2 right-1 transform translate-x-1/2
+                   -bottom-6 right-9 transform translate-x-1/2
                    bg-green-500 hover:bg-green-600 text-white
                    rounded-full w-10 h-10 flex items-center justify-center shadow-lg"
               aria-label="Add to cart"
