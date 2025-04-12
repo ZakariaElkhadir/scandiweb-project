@@ -10,11 +10,8 @@ const CartOverlay = () => {
 
   return (
     <div className="fixed inset-0 flex justify-end z-10">
-      {/* Semi-transparent background */}
-      <div
-        className="absolute bg-amber-500 inset-0 "
-        onClick={() => console.log("Background clicked")}
-      ></div>
+    
+      
 
       {/* Cart content */}
       <div className="relative w-96 bg-white h-full p-4 shadow-lg z-20">

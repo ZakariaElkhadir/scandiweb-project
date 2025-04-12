@@ -65,14 +65,28 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Sync with localStorage
   useEffect(() => {
+    localStorage.removeItem("cart");
     const savedCart = localStorage.getItem("cart");
     if (savedCart) {
       try {
-        const parsedCart = JSON.parse(savedCart);
+        let parsedCart = JSON.parse(savedCart);
+  
         if (Array.isArray(parsedCart)) {
+          // First, clean up or convert the item.price to be a valid number
           parsedCart.forEach((item) => {
-            if (!item.price) item.price = 0;
+            if (typeof item.price === "string") {
+              // Strip out non-digit characters, then parse as float
+              item.price = parseFloat(item.price.replace(/[^0-9.]/g, ""));
+            }
+            // If it's still invalid or missing, set to 0
+            if (!item.price || isNaN(item.price)) {
+              item.price = 0;
+            }
           });
+  
+          // Optionally remove items that are still invalid
+          parsedCart = parsedCart.filter((item) => !isNaN(item.price));
+  
           dispatch({ type: "ADD_ITEM", payload: parsedCart });
         }
       } catch (error) {
@@ -80,6 +94,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     }
   }, []);
+  
 
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(state.items));
