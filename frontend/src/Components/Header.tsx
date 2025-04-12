@@ -67,12 +67,9 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
         </button>
       </div>
       {isCartOpen && (
-       <div className="fixed inset-0 flex justify-end z-10">
-       {/* Remove or adjust any extra background div here if needed */}
-       <div className="relative w-96 bg-white h-full p-4 shadow-lg z-20">
-         <CartOverlay />
-       </div>
-     </div>
+        <div className="fixed right-0 flex justify-end z-10">
+          <CartOverlay />
+        </div>
       )}
     </header>
   );

@@ -9,10 +9,7 @@ const CartOverlay = () => {
   );
 
   return (
-    <div className="fixed inset-0 flex justify-end z-10">
-    
-      
-
+    <div className="fixed top-10 flex justify-end z-10 right-20 ">
       {/* Cart content */}
       <div className="relative w-96 bg-white h-full p-4 shadow-lg z-20">
         <h2 className="text-lg font-semibold mb-4">
