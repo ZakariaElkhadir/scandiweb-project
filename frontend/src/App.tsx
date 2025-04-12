@@ -15,7 +15,7 @@ function App() {
             activeCategory={activeCategory}
             setActiveCategory={setActiveCategory}
           />
-        </CartProvider>
+        
         <main className="container pt-20 ">
           {/* <ProductsSection activeCategory={activeCategory}/> */}
           {/* <ProductPage productId="apple-airtag" /> */}
@@ -28,6 +28,7 @@ function App() {
             <Route path="/product/:id" element={<ProductPage />} />
           </Routes>
         </main>
+        </CartProvider>
       </Router>
     </>
   );
