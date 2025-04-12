@@ -1,6 +1,6 @@
 import logo from "../assets/logo.png";
 import { ShoppingCart } from "lucide-react";
-import Cart from "./Cart";
+import CartOverlay from "./Cart/Cart";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -46,13 +46,14 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
         </div>
 
         {/* Logo */}
-        
-          <div className="logo absolute left-1/2 transform -translate-x-1/2">
-          <Link to="/"> {/* Wrap the logo in a Link component */}
-    <img src={logo} alt="Logo" className="h-8 cursor-pointer" />
-  </Link>
-          </div>
-        
+
+        <div className="logo absolute left-1/2 transform -translate-x-1/2">
+          <Link to="/">
+            {" "}
+            {/* Wrap the logo in a Link component */}
+            <img src={logo} alt="Logo" className="h-8 cursor-pointer" />
+          </Link>
+        </div>
 
         {/* Cart button */}
         <button
@@ -66,8 +67,12 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
         </button>
       </div>
       {isCartOpen && (
-    
-          <Cart />
+        <>
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-10"></div>
+          <div className="z-20">
+            <CartOverlay />
+          </div>
+        </>
       )}
     </header>
   );
