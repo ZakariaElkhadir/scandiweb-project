@@ -28,20 +28,20 @@ const CartContext = createContext<{
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
     case "ADD_ITEM":
-      const existingItemIndex = state.items.findIndex(
-        (item) =>
-          item.id === action.payload.id &&
-          item.selectedSize === action.payload.selectedSize &&
-          item.selectedColor === action.payload.selectedColor
-      );
+  const existingItemIndex = state.items.findIndex(
+    (item) =>
+      item.id === action.payload.id &&
+      item.selectedSize === action.payload.selectedSize &&
+      item.selectedColor === action.payload.selectedColor
+  );
 
-      if (existingItemIndex !== -1) {
-        const updatedItems = [...state.items];
-        updatedItems[existingItemIndex].quantity += action.payload.quantity;
-        return { items: updatedItems };
-      }
+  if (existingItemIndex !== -1) {
+    const updatedItems = [...state.items];
+    updatedItems[existingItemIndex].quantity += action.payload.quantity;
+    return { items: updatedItems };
+  }
 
-      return { items: [...state.items, action.payload] };
+  return { items: [...state.items, action.payload] };
 
     case "UPDATE_ITEM":
       const updatedItems = state.items

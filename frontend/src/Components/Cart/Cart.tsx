@@ -42,8 +42,7 @@ const CartOverlay = () => {
                   {item.selectedColor && `Color: ${item.selectedColor}`}
                 </p>
                 <p className="text-sm font-medium">
-                  {item.currency}
-                  {(item.price || 0).toFixed(2)}
+                  {item.currency} {(item.price || 0).toFixed(2)}
                 </p>
               </div>
               <div className="flex flex-col items-center">
@@ -79,7 +78,9 @@ const CartOverlay = () => {
           ))}
         </div>
         <div className="mt-4">
-          <p className="text-sm font-medium">Total: ${totalPrice.toFixed(2)}</p>
+          <p className="text-sm font-medium">
+            Total: {state.items[0]?.currency || "$"} {totalPrice.toFixed(2)}
+          </p>
           <button
             className={`w-full py-2 mt-4 ${
               state.items.length > 0

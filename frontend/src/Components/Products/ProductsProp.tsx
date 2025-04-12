@@ -18,20 +18,20 @@ const ProductsCard = ({
   price,
   imageUrl,
   inStock,
-  currency = "$", // Default currency
+  currency, 
 }: ProductProps) => {
   const { dispatch } = useCart(); // Access the dispatch function from the CartContext
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
-  
+    const numericPrice = parseFloat(price.replace(/[^0-9.]/g, ""));
     dispatch({
       type: "ADD_ITEM",
       payload: {
         id,
         name,
         image: imageUrl,
-        price: parseFloat(price),
+        price: numericPrice,
         currency,
         quantity: 1,
       },
