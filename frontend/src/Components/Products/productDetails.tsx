@@ -31,7 +31,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
   const { dispatch } = useCart();
 
   // Find size and color attributes
-  const sizeAttribute = product.attributes.find((attr) => attr.name === "Size");
+ const sizeAttribute = product.attributes.find((attr) => attr.name === "Size");
   const colorAttribute = product.attributes.find(
     (attr) => attr.name === "Color",
   );

@@ -33,22 +33,15 @@ const ProductsCard = ({
 
   // Check if product has attributes that require selection (like size or color)
   const hasRequiredAttributes = attributes.some(
-    (attr) => ["Size", "Color"].includes(attr.name) && attr.items.length > 0,
+    (attr) => ["Size", "Color"].includes(attr.name) && attr.items.length > 0
   );
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
-    if (hasRequiredAttributes) {
-      // If it has required attributes, we'll direct users to the product page
-      // We could show a toast message explaining why
-      toast.info(`Please select options for ${name}`);
-      // Instead of changing the page, we'll let the Link component handle navigation
-      return;
-    }
-
     const numericPrice = parseFloat(price.replace(/[^0-9.]/g, ""));
+    const resolvedCurrency = currency || "USD"; // Provide a default currency if undefined
+
     dispatch({
       type: "ADD_ITEM",
       payload: {
@@ -56,11 +49,16 @@ const ProductsCard = ({
         name,
         image: imageUrl,
         price: numericPrice,
-        currency,
+        currency: resolvedCurrency,
         quantity: 1,
-        attributes,
       },
     });
+
+    if (hasRequiredAttributes) {
+      toast.info(`Please select options for ${name}`);
+
+      return;
+    }
 
     // Check if toast is initialized and use a try-catch to handle errors
     try {
