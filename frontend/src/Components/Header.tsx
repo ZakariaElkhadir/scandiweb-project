@@ -3,6 +3,7 @@ import { ShoppingCart } from "lucide-react";
 import CartOverlay from "./Cart/Cart";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useCart } from "./Cart/CartContext";
 
 interface HeaderProps {
   activeCategory: string;
@@ -18,6 +19,8 @@ interface HeaderProps {
 const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
   const categories = ["All", "Clothes", "Tech"];
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const { state } = useCart();
+  const totalItems = state.items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <header className="bg-white h-16 relative w-full">
@@ -57,13 +60,21 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
 
         {/* Cart button */}
         <button
-          className="text-gray-700 hover:text-gray-900 cursor-pointer"
+          className="text-gray-700 hover:text-gray-900 cursor-pointer "
           data-testid="cart-btn"
           onClick={() => {
             setIsCartOpen(!isCartOpen);
           }}
         >
-          <ShoppingCart />
+          <div className="flex relative">
+            <ShoppingCart />
+            {/* Badge showing number of items */}
+            {totalItems > 0 && (
+              <div className="absolute -top-1 -right-2 bg-black text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                {totalItems}
+              </div>
+            )}
+          </div>
         </button>
       </div>
       {isCartOpen && (
