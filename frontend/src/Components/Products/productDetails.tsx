@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useCart } from "../Cart/CartContext";
+import { toast } from "react-toastify";
 
 interface ProductDetailsProps {
   product: {
@@ -55,13 +56,13 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
 
     // Check if size is selected when needed
     if (sizeAttribute && !selectedSize) {
-      alert("Please select a size");
+      toast.error("Please select a size");
       return;
     }
-
+  
     // Check if color is selected when needed
     if (colorAttribute && !selectedColor) {
-      alert("Please select a color");
+      toast.error("Please select a color");
       return;
     }
 
