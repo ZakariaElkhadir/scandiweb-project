@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useCart } from "../Cart/CartContext";
 
 interface ProductDetailsProps {
   product: {
+    id: string; // Make sure product has an ID
     name: string;
     images: string[];
     attributes: {
@@ -25,14 +27,15 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [hoveredSizeIndex, setHoveredSizeIndex] = useState<number | null>(null);
+  const { dispatch } = useCart();
 
   // Find size and color attributes
   const sizeAttribute = product.attributes.find((attr) => attr.name === "Size");
   const colorAttribute = product.attributes.find(
-    (attr) => attr.name === "Color"
+    (attr) => attr.name === "Color",
   );
 
-  //  abbreviated size label
+  // Abbreviated size label
   const getSizeAbbreviation = (displayValue: string): string => {
     const lowerValue = displayValue.toLowerCase();
     if (lowerValue === "small") return "S";
@@ -44,6 +47,39 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
     if (lowerValue === "3x large" || lowerValue === "xxx large") return "3XL";
     // If no match, returning the original value
     return displayValue;
+  };
+
+  // Add to cart handler
+  const handleAddToCart = () => {
+    if ((product.in_stock ?? 0) <= 0) return;
+
+    // Check if size is selected when needed
+    if (sizeAttribute && !selectedSize) {
+      alert("Please select a size");
+      return;
+    }
+
+    // Check if color is selected when needed
+    if (colorAttribute && !selectedColor) {
+      alert("Please select a color");
+      return;
+    }
+
+    // Dispatch to cart
+    dispatch({
+      type: "ADD_ITEM",
+      payload: {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: 1,
+        image: product.images[selectedImage], // Use the selected image
+        currency: product.currency.symbol,
+        attributes: product.attributes, // Include all attributes for later modification
+        selectedSize: selectedSize,
+        selectedColor: selectedColor,
+      },
+    });
   };
 
   return (
@@ -164,6 +200,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
           }`}
           data-testid="add-to-cart"
           disabled={(product.in_stock ?? 0) <= 0}
+          onClick={handleAddToCart}
         >
           {(product.in_stock ?? 0) > 0 ? "ADD TO CART" : "OUT OF STOCK"}
         </button>

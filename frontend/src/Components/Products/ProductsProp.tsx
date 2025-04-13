@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Maximize } from "lucide-react";
 import fallbackImage from "../../assets/images/fallback.jpg";
 import { useCart } from "../Cart/CartContext";
-import { toast } from "react-toastify"; 
+import { toast } from "react-toastify";
+
 interface ProductProps {
   id: string;
   imageUrl: string;
@@ -10,6 +11,13 @@ interface ProductProps {
   price: string;
   inStock?: number;
   currency?: string;
+  attributes?: {
+    name: string;
+    items: {
+      value: string;
+      display_value: string;
+    }[];
+  }[];
 }
 
 const ProductsCard = ({
@@ -18,12 +26,28 @@ const ProductsCard = ({
   price,
   imageUrl,
   inStock,
-  currency, 
+  currency,
+  attributes = [],
 }: ProductProps) => {
   const { dispatch } = useCart(); // Access the dispatch function from the CartContext
 
+  // Check if product has attributes that require selection (like size or color)
+  const hasRequiredAttributes = attributes.some(
+    (attr) => ["Size", "Color"].includes(attr.name) && attr.items.length > 0,
+  );
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+
+    if (hasRequiredAttributes) {
+      // If it has required attributes, we'll direct users to the product page
+      // We could show a toast message explaining why
+      toast.info(`Please select options for ${name}`);
+      // Instead of changing the page, we'll let the Link component handle navigation
+      return;
+    }
+
     const numericPrice = parseFloat(price.replace(/[^0-9.]/g, ""));
     dispatch({
       type: "ADD_ITEM",
@@ -34,9 +58,10 @@ const ProductsCard = ({
         price: numericPrice,
         currency,
         quantity: 1,
+        attributes,
       },
     });
-  
+
     toast.success(`${name} added to cart!`);
   };
 
@@ -59,24 +84,49 @@ const ProductsCard = ({
               ${inStock === 0 ? "opacity-50 grayscale" : ""}`}
           />
 
-          {/* Cart button that appears on hover */}
+          {/* Action buttons that appear on hover */}
           {inStock !== undefined && inStock > 0 && (
-            <button
-              onClick={handleAddToCart}
+            <div
               className="absolute z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300
-                   -bottom-6 right-9 transform translate-x-1/2
-                   bg-green-500 hover:bg-green-600 text-white
-                   rounded-full w-10 h-10 flex items-center justify-center shadow-lg"
-              aria-label="Add to cart"
+                right-9 -bottom-6 flex gap-2"
             >
-              <ShoppingCart className="w-6 h-6" strokeWidth={1.5} />
-            </button>
+              {/* View details button for products with attributes */}
+              {hasRequiredAttributes ? (
+                <button
+                  onClick={(e) => {
+                    e.preventDefault(); // Let the Link handle navigation
+                  }}
+                  className="bg-blue-500 hover:bg-blue-600 text-white
+                       rounded-full w-10 h-10 flex items-center justify-center shadow-lg"
+                  aria-label="View details"
+                >
+                  <Maximize className="w-5 h-5" strokeWidth={1.5} />
+                </button>
+              ) : (
+                /* Add to cart button for products without required attributes */
+                <button
+                  onClick={handleAddToCart}
+                  className="bg-green-500 hover:bg-green-600 text-white
+                       rounded-full w-10 h-10 flex items-center justify-center shadow-lg"
+                  aria-label="Add to cart"
+                >
+                  <ShoppingCart className="w-5 h-5" strokeWidth={1.5} />
+                </button>
+              )}
+            </div>
           )}
 
           {/* Out of Stock Badge */}
           {inStock === 0 && (
             <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 text-white px-2 py-1 rounded">
               Out of Stock
+            </span>
+          )}
+
+          {/* Optional: Show a "Select Options" label for products with attributes */}
+          {hasRequiredAttributes && inStock !== 0 && (
+            <span className="absolute bottom-0 left-0 bg-gray-800 text-white text-xs px-2 py-1">
+              Select Options
             </span>
           )}
         </div>
