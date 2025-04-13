@@ -62,7 +62,19 @@ const ProductsCard = ({
       },
     });
 
-    toast.success(`${name} added to cart!`);
+    // Check if toast is initialized and use a try-catch to handle errors
+    try {
+      toast.success(`${name} added to cart!`, {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    } catch (error) {
+      console.log(`Toast notification failed: ${name} added to cart!`);
+    }
   };
 
   const kebabCase = (str: string) => str.toLowerCase().replace(/\s+/g, "-");
