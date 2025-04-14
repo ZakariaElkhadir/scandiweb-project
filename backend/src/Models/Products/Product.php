@@ -1,135 +1,16 @@
 <?php
 namespace Models\Products;
 
-require_once __DIR__ . '/../../Config/Database.php';
 
 use Config\Database;
+use Models\Products\ProductFactory;
 
 /**
- * AbstractProduct
- * Base class for all product types.
- */
-abstract class AbstractProduct
-{
-    protected string $id;
-    protected string $name;
-    protected float $price;
-    protected array $images;
-    protected string $categoryName;
-    protected int $inStock;
-    protected string $currencyLabel;
-    protected string $currencySymbol;
-
-    public function __construct(
-        string $id,
-        string $name,
-        float $price,
-        array $images,
-        string $categoryName,
-        int $inStock,
-        string $currencyLabel,
-        string $currencySymbol
-    ) {
-        $this->id = $id;
-        $this->name = $name;
-        $this->price = $price;
-        $this->images = $images;
-        $this->categoryName = $categoryName;
-        $this->inStock = $inStock;
-        $this->currencyLabel = $currencyLabel;
-        $this->currencySymbol = $currencySymbol;
-    }
-
-    abstract public function getDetails(): array;
-}
-
-/**
- * Example subclass: TechProduct
- */
-class TechProduct extends AbstractProduct
-{
-    // Any tech-specific fields/methods here
-
-    public function getDetails(): array
-    {
-        return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'price' => $this->price,
-            'images' => $this->images,
-            'category_name' => $this->categoryName,
-            'in_stock' => $this->inStock,
-            'currency' => [
-                'label' => $this->currencyLabel,
-                'symbol' => $this->currencySymbol,
-            ],
-        ];
-    }
-}
-
-/**
- * Example subclass: ClothesProduct
- */
-class ClothesProduct extends AbstractProduct
-{
-    // Any clothes-specific fields/methods here
-
-    public function getDetails(): array
-    {
-        return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'price' => $this->price,
-            'images' => $this->images,
-            'category_name' => $this->categoryName,
-            'in_stock' => $this->inStock,
-            'sizes' => ['S', 'M', 'L'],
-            'currency' => [
-                'label' => $this->currencyLabel,
-                'symbol' => $this->currencySymbol,
-            ],
-        ];
-    }
-}
-
-/**
- * Factory creates product objects without using if/switch directly.
- * Maps categories to specific subclass names.
- */
-class ProductFactory
-{
-    private static array $classMap = [
-        'tech' => TechProduct::class,
-        'clothes' => ClothesProduct::class,
-        // Add more types here, matching your DB category_name
-    ];
-
-    public static function create(array $row): AbstractProduct
-    {
-        $type = strtolower($row['category_name'] ?? '');
-
-        // Fallback or exception if the type is not recognized
-        if (!isset(self::$classMap[$type])) {
-            throw new \RuntimeException('Unknown product type: ' . $type);
-        }
-
-        $className = self::$classMap[$type];
-        return new $className(
-            $row['id'] ?? '',
-            $row['name'] ?? 'Unknown',
-            (float) ($row['price'] ?? 0),
-            // Split images on comma, handle null gracefully
-            explode(',', $row['images'] ?? ''),
-            $row['category_name'] ?? 'unknown',
-            (int) ($row['in_stock'] ?? 0),
-            $row['currency'] ?? 'USD',
-            $row['currency_symbol'] ?? '$'
-        );
-    }
-}
-
-/**
- * Main Product class responsible for fetching data and returning polymorphic objects.
+ * Class Product
+ *
+ * Handles product-related database operations.
+ *
+ * @package Models\Products
  */
 class Product
 {
