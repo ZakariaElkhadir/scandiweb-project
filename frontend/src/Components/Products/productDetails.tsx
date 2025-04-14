@@ -52,19 +52,25 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
 
   // Add to cart handler
   const handleAddToCart = () => {
-    if ((product.in_stock ?? 0) <= 0) return;
+    if ((product.in_stock ?? 0) <= 0) {
+      toast.error(`${product.name} is out of stock`);
+      return;
+    }
 
     // Check if size is selected when needed
     if (sizeAttribute && !selectedSize) {
-      toast.error("Please select a size");
+      toast.error(`Please select a size for ${product.name}`);
       return;
     }
-  
+    
     // Check if color is selected when needed
     if (colorAttribute && !selectedColor) {
-      toast.error("Please select a color");
+      toast.error(`Please select a color for ${product.name}`);
       return;
     }
+
+    // Show success toast
+    toast.success(`${product.name} added to cart successfully!`);
 
     // Dispatch to cart
     dispatch({
