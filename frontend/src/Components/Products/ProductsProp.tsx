@@ -1,8 +1,7 @@
 import { Link } from "react-router-dom";
 import { ShoppingCart, Maximize } from "lucide-react";
 import fallbackImage from "../../assets/images/fallback.jpg";
-import { useCart } from "../Cart/CartContext";
-import { toast } from "react-toastify";
+
 
 interface ProductProps {
   id: string;
@@ -29,51 +28,51 @@ const ProductsCard = ({
   currency,
   attributes = [],
 }: ProductProps) => {
-  const { dispatch } = useCart(); // Access the dispatch function from the CartContext
+ // Access the dispatch function from the CartContext
 
   // Check if product has attributes that require selection (like size or color)
   const hasRequiredAttributes = attributes.some(
     (attr) => ["Size", "Color"].includes(attr.name) && attr.items.length > 0
   );
 
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const numericPrice = parseFloat(price.replace(/[^0-9.]/g, ""));
-    const resolvedCurrency = currency || "USD"; // Provide a default currency if undefined
+  // const handleAddToCart = (e: React.MouseEvent) => {
+  //   e.preventDefault();
+  //   e.stopPropagation();
+  //   const numericPrice = parseFloat(price.replace(/[^0-9.]/g, ""));
+  //   const resolvedCurrency = currency || "USD"; // Provide a default currency if undefined
 
-    dispatch({
-      type: "ADD_ITEM",
-      payload: {
-        id,
-        name,
-        image: imageUrl,
-        price: numericPrice,
-        currency: resolvedCurrency,
-        quantity: 1,
-      },
-    });
+  //   dispatch({
+  //     type: "ADD_ITEM",
+  //     payload: {
+  //       id,
+  //       name,
+  //       image: imageUrl,
+  //       price: numericPrice,
+  //       currency: resolvedCurrency,
+  //       quantity: 1,
+  //     },
+  //   });
 
-    if (hasRequiredAttributes) {
-      toast.info(`Please select options for ${name}`);
+  //   if (hasRequiredAttributes) {
+  //     toast.info(`Please select options for ${name}`);
 
-      return;
-    }
+  //     return;
+  //   }
 
-    // Check if toast is initialized and use a try-catch to handle errors
-    try {
-      toast.success(`${name} added to cart!`, {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-    } catch (error) {
-      console.log(`Toast notification failed: ${name} added to cart!`);
-    }
-  };
+  //   // Check if toast is initialized and use a try-catch to handle errors
+  //   try {
+  //     toast.success(`${name} added to cart!`, {
+  //       position: "bottom-right",
+  //       autoClose: 3000,
+  //       hideProgressBar: false,
+  //       closeOnClick: true,
+  //       pauseOnHover: true,
+  //       draggable: true,
+  //     });
+  //   } catch (error) {
+  //     console.log(`Toast notification failed: ${name} added to cart!`);
+  //   }
+  // };
 
   const kebabCase = (str: string) => str.toLowerCase().replace(/\s+/g, "-");
 
@@ -115,7 +114,7 @@ const ProductsCard = ({
               ) : (
                 /* Add to cart button for products without required attributes */
                 <button
-                  onClick={handleAddToCart}
+                  
                   className="bg-green-500 hover:bg-green-600 text-white
                        rounded-full w-10 h-10 flex items-center justify-center shadow-lg"
                   aria-label="Add to cart"
