@@ -10,7 +10,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
 
   const totalPrice = state.items.reduce(
     (sum, item) => sum + (item.price || 0) * item.quantity,
-    0,
+    0
   );
 
   // Abbreviated size label helper function
@@ -29,7 +29,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
   const handleAttributeChange = (
     itemId: string,
     attributeName: string,
-    value: string,
+    value: string
   ) => {
     dispatch({
       type: "UPDATE_ITEM_ATTRIBUTES",
@@ -123,8 +123,12 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                             <button
                               data-testid={
                                 item.selectedSize === sizeItem.value
-                                  ? `cart-itemattribute-size-${sizeItem.value.toLowerCase().replace(/\s+/g, "-")}-selected`
-                                  : `cart-itemattribute-size-${sizeItem.value.toLowerCase().replace(/\s+/g, "-")}`
+                                  ? `cart-itemattribute-size-${sizeItem.value
+                                      .toLowerCase()
+                                      .replace(/\s+/g, "-")}-selected`
+                                  : `cart-itemattribute-size-${sizeItem.value
+                                      .toLowerCase()
+                                      .replace(/\s+/g, "-")}`
                               }
                               className={`w-6 h-6 flex items-center justify-center border text-xs ${
                                 item.selectedSize === sizeItem.value
@@ -135,7 +139,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                                 handleAttributeChange(
                                   item.id,
                                   "Size",
-                                  sizeItem.value,
+                                  sizeItem.value
                                 )
                               }
                               onMouseEnter={() =>
@@ -172,8 +176,12 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                             key={colorItem.value}
                             data-testid={
                               item.selectedColor === colorItem.value
-                                ? `cart-itemattribute-color-${colorItem.value.toLowerCase().replace(/\s+/g, "-")}-selected`
-                                : `cart-itemattribute-color-${colorItem.value.toLowerCase().replace(/\s+/g, "-")}`
+                                ? `cart-itemattribute-color-${colorItem.value
+                                    .toLowerCase()
+                                    .replace(/\s+/g, "-")}-selected`
+                                : `cart-itemattribute-color-${colorItem.value
+                                    .toLowerCase()
+                                    .replace(/\s+/g, "-")}`
                             }
                             className={`w-5 h-5 rounded-sm ${
                               item.selectedColor === colorItem.value
@@ -185,7 +193,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                               handleAttributeChange(
                                 item.id,
                                 "Color",
-                                colorItem.value,
+                                colorItem.value
                               )
                             }
                             title={colorItem.display_value}

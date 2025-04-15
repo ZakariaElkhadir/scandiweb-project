@@ -45,6 +45,24 @@ const CartContext = createContext<{
   dispatch: React.Dispatch<CartAction>;
 } | null>(null);
 
+/**
+ * Reducer function to manage the state of the shopping cart.
+ *
+ * @param state - The current state of the cart, containing an array of cart items.
+ * @param action - The action to be performed on the cart state, including type and payload.
+ * @returns The updated cart state after applying the specified action.
+ *
+ * Actions:
+ * - `"ADD_ITEM"`: Adds a new item or an array of items to the cart. If the item already exists
+ *   (based on `cartItemId`), it updates the quantity. Generates unique `cartItemId` for items
+ *   based on product ID and selected attributes.
+ * - `"UPDATE_ITEM"`: Updates the quantity of an item in the cart. Matches items using `cartItemId`
+ *   (if provided) or falls back to `id`. Automatically removes items with a quantity of 0.
+ * - `"UPDATE_ITEM_ATTRIBUTES"`: Updates the attributes (e.g., size, color) of an item in the cart.
+ *   Generates a new `cartItemId` for the updated attributes. If an item with the same attributes
+ *   already exists, it merges the quantities and removes the original item.
+ *
+ */
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
     case "ADD_ITEM":
@@ -66,7 +84,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 
       // Find if we already have this item with the same attributes
       const existingItemIndex = state.items.findIndex(
-        (item) => item.cartItemId === newItem.cartItemId,
+        (item) => item.cartItemId === newItem.cartItemId
       );
 
       if (existingItemIndex !== -1) {
@@ -122,7 +140,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
       // Check if we already have an item with these exact attributes
       const duplicateItem = state.items.find(
         (item) =>
-          item.cartItemId === updatedItem.cartItemId && item !== itemToUpdate,
+          item.cartItemId === updatedItem.cartItemId && item !== itemToUpdate
       );
 
       if (duplicateItem) {
@@ -160,7 +178,9 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
   }
 };
 const generateCartItemId = (item: CartItem): string => {
-  return `${item.id}_${item.selectedSize || "nosize"}_${item.selectedColor || "nocolor"}`;
+  return `${item.id}_${item.selectedSize || "nosize"}_${
+    item.selectedColor || "nocolor"
+  }`;
 };
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -168,25 +188,20 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [state, dispatch] = useReducer(cartReducer, { items: [] });
 
-  // Load cart from localStorage on initial render
   useEffect(() => {
     const savedCart = localStorage.getItem("cart");
     if (savedCart) {
       try {
         let parsedCart = JSON.parse(savedCart);
         if (Array.isArray(parsedCart)) {
-          // First, clean up or convert the item.price to be a valid number
           parsedCart.forEach((item) => {
             if (typeof item.price === "string") {
-              // Strip out non-digit characters, then parse as float
               item.price = parseFloat(item.price.replace(/[^0-9.]/g, ""));
             }
-            // If it's still invalid or missing, set to 0
             if (!item.price || isNaN(item.price)) {
               item.price = 0;
             }
           });
-          // Optionally remove items that are still invalid
           parsedCart = parsedCart.filter((item) => !isNaN(item.price));
           dispatch({ type: "ADD_ITEM", payload: parsedCart });
         }

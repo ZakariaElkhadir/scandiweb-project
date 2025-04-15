@@ -19,6 +19,28 @@ interface ProductProps {
   }[];
 }
 
+/**
+ * A React functional component that renders a product card with details such as name, price, image, and stock status.
+ * The card includes hover effects, action buttons, and conditional rendering based on product attributes and stock availability.
+ *
+ * @param {ProductProps} props - The properties passed to the component.
+ * @param {string} props.id - The unique identifier for the product.
+ * @param {string} props.name - The name of the product.
+ * @param {string} props.price - The price of the product, formatted as a string.
+ * @param {string} props.imageUrl - The URL of the product's image.
+ * @param {number} props.inStock - The stock availability of the product. A value of 0 indicates out of stock.
+ * @param {string} [props.currency] - The currency symbol for the product price. Defaults to "USD" if undefined.
+ * @param {Array<{ name: string; items: Array<{ id: string; value: string }> }>} [props.attributes=[]] - 
+ * An array of product attributes, such as size or color, that may require user selection.
+ *
+ * @returns {JSX.Element} A JSX element representing the product card.
+ *
+ * @remarks
+ * - The component uses conditional rendering to display different UI elements based on the product's stock status
+ *   and whether it has required attributes.
+ * - Includes hover effects for action buttons and image scaling.
+ * - Displays a fallback image if the provided image URL fails to load.
+ */
 const ProductsCard = ({
   id,
   name,
