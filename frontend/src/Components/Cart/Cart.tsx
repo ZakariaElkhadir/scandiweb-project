@@ -73,6 +73,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                       type: "UPDATE_ITEM",
                       payload: {
                         id: item.id,
+                        cartItemId: item.cartItemId,
                         quantity: item.quantity + 1,
                       },
                     })
@@ -94,6 +95,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                       type: "UPDATE_ITEM",
                       payload: {
                         id: item.id,
+                        cartItemId: item.cartItemId,
                         quantity: Math.max(0, item.quantity - 1),
                       },
                     })

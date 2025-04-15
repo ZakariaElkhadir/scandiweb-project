@@ -17,6 +17,7 @@ interface CartItem {
       display_value: string;
     }[];
   }[];
+  cartItemId?: string;
 }
 
 interface CartState {
@@ -26,7 +27,10 @@ interface CartState {
 // Extended CartAction to include UPDATE_ITEM_ATTRIBUTES
 type CartAction =
   | { type: "ADD_ITEM"; payload: CartItem | CartItem[] }
-  | { type: "UPDATE_ITEM"; payload: { id: string; quantity: number } }
+  | {
+      type: "UPDATE_ITEM";
+      payload: { id: string; cartItemId?: string; quantity: number };
+    }
   | {
       type: "UPDATE_ITEM_ATTRIBUTES";
       payload: {
@@ -46,32 +50,51 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
     case "ADD_ITEM":
       // Handle both single item and array of items
       if (Array.isArray(action.payload)) {
-        return { items: [...state.items, ...action.payload] };
+        // Generate unique IDs for all items in the array
+        const itemsWithIds = action.payload.map((item) => ({
+          ...item,
+          cartItemId: generateCartItemId(item),
+        }));
+        return { items: [...state.items, ...itemsWithIds] };
       }
+
+      // Generate a unique ID for this item based on product ID and selected attributes
+      const newItem = {
+        ...action.payload,
+        cartItemId: generateCartItemId(action.payload),
+      };
 
       // Find if we already have this item with the same attributes
       const existingItemIndex = state.items.findIndex(
-        (item) =>
-          item.id === action.payload.id &&
-          item.selectedSize === action.payload.selectedSize &&
-          item.selectedColor === action.payload.selectedColor,
+        (item) => item.cartItemId === newItem.cartItemId,
       );
 
       if (existingItemIndex !== -1) {
         const updatedItems = [...state.items];
-        updatedItems[existingItemIndex].quantity += action.payload.quantity;
+        updatedItems[existingItemIndex].quantity += newItem.quantity;
         return { items: updatedItems };
       }
 
-      return { items: [...state.items, action.payload] };
+      return { items: [...state.items, newItem] };
 
     case "UPDATE_ITEM":
+      // Use cartItemId for the update if available, otherwise fallback to id
       const updatedItems = state.items
-        .map((item) =>
-          item.id === action.payload.id
-            ? { ...item, quantity: action.payload.quantity }
-            : item,
-        )
+        .map((item) => {
+          // Check by cartItemId (which includes attribute info) instead of just product id
+          if (
+            action.payload.cartItemId &&
+            item.cartItemId === action.payload.cartItemId
+          ) {
+            return { ...item, quantity: action.payload.quantity };
+          } else if (
+            !action.payload.cartItemId &&
+            item.id === action.payload.id
+          ) {
+            return { ...item, quantity: action.payload.quantity };
+          }
+          return item;
+        })
         .filter((item) => item.quantity > 0); // Automatically remove items with quantity 0
 
       return { items: updatedItems };
@@ -80,24 +103,26 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
       // Find the specific item to update
       const { id, attributeName, value } = action.payload;
 
-      // Check if changing attributes would make this a duplicate of another item
-      const updatedAttribute =
-        attributeName === "Size" ? "selectedSize" : "selectedColor";
-      const otherAttribute =
-        attributeName === "Size" ? "selectedColor" : "selectedSize";
-
       // Find the item we want to modify
       const itemToUpdate = state.items.find((item) => item.id === id);
 
       if (!itemToUpdate) return state;
 
-      // Check if we already have an item with the new attribute value
+      // Create a copy of the item with updated attribute
+      const updatedItem = { ...itemToUpdate };
+      if (attributeName === "Size") {
+        updatedItem.selectedSize = value;
+      } else if (attributeName === "Color") {
+        updatedItem.selectedColor = value;
+      }
+
+      // Generate a new cart item ID with the updated attributes
+      updatedItem.cartItemId = generateCartItemId(updatedItem);
+
+      // Check if we already have an item with these exact attributes
       const duplicateItem = state.items.find(
         (item) =>
-          item.id === id &&
-          item[updatedAttribute as keyof CartItem] === value &&
-          item[otherAttribute as keyof CartItem] ===
-            itemToUpdate[otherAttribute as keyof CartItem],
+          item.cartItemId === updatedItem.cartItemId && item !== itemToUpdate,
       );
 
       if (duplicateItem) {
@@ -105,7 +130,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
         return {
           items: state.items
             .map((item) => {
-              if (item === duplicateItem) {
+              if (item.cartItemId === duplicateItem.cartItemId) {
                 return {
                   ...item,
                   quantity: item.quantity + itemToUpdate.quantity,
@@ -119,15 +144,11 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
             .filter((item) => item.quantity > 0),
         };
       } else {
-        // Otherwise just update the attribute
+        // Otherwise just update the attribute and cart item ID
         return {
           items: state.items.map((item) => {
-            if (item.id === id) {
-              if (attributeName === "Size") {
-                return { ...item, selectedSize: value };
-              } else if (attributeName === "Color") {
-                return { ...item, selectedColor: value };
-              }
+            if (item === itemToUpdate) {
+              return updatedItem;
             }
             return item;
           }),
@@ -137,6 +158,9 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
     default:
       return state;
   }
+};
+const generateCartItemId = (item: CartItem): string => {
+  return `${item.id}_${item.selectedSize || "nosize"}_${item.selectedColor || "nocolor"}`;
 };
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
