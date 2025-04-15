@@ -12,131 +12,144 @@ use Throwable;
 
 class GraphQL
 {
-    static public function handle()
+    public static function handle()
     {
-
-        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
             http_response_code(204);
-            exit;
+            exit();
         }
         try {
             $queryType = new ObjectType([
-                'name' => 'Query',
-                'fields' => [
-                    'product' => [
-                        'type' => new ObjectType([
-                            'name' => 'ProductDetails',
-                            'fields' => [
-                                'id' => Type::id(),
-                                'name' => Type::string(),
-                                'description' => Type::string(),
-                                'brand' => Type::string(),
-                                'price' => Type::float(),
-                                'currency' => new ObjectType([
-                                    'name' => 'Currency',
-                                    'fields' => [
-                                        'label' => Type::string(),
-                                        'symbol' => Type::string(),
+                "name" => "Query",
+                "fields" => [
+                    "product" => [
+                        "type" => new ObjectType([
+                            "name" => "ProductDetails",
+                            "fields" => [
+                                "id" => Type::id(),
+                                "name" => Type::string(),
+                                "description" => Type::string(),
+                                "brand" => Type::string(),
+                                "price" => Type::float(),
+                                "currency" => new ObjectType([
+                                    "name" => "Currency",
+                                    "fields" => [
+                                        "label" => Type::string(),
+                                        "symbol" => Type::string(),
                                     ],
                                 ]),
-                                'images' => Type::listOf(Type::string()),
-                                'attributes' => Type::listOf(new ObjectType([
-                                    'name' => 'Attribute',
-                                    'fields' => [
-                                        'name' => Type::string(),
-                                        'type' => Type::string(),
-                                        'items' => Type::listOf(new ObjectType([
-                                            'name' => 'AttributeItem',
-                                            'fields' => [
-                                                'display_value' => Type::string(),
-                                                'value' => Type::string(),
-                                            ],
-                                        ])),
-                                    ],
-                                ])),
-                                'in_stock' => Type::int(),
+                                "images" => Type::listOf(Type::string()),
+                                "attributes" => Type::listOf(
+                                    new ObjectType([
+                                        "name" => "Attribute",
+                                        "fields" => [
+                                            "name" => Type::string(),
+                                            "type" => Type::string(),
+                                            "items" => Type::listOf(
+                                                new ObjectType([
+                                                    "name" => "AttributeItem",
+                                                    "fields" => [
+                                                        "display_value" => Type::string(),
+                                                        "value" => Type::string(),
+                                                    ],
+                                                ])
+                                            ),
+                                        ],
+                                    ])
+                                ),
+                                "in_stock" => Type::int(),
                             ],
                         ]),
-                        'args' => [
-                            'id' => Type::nonNull(Type::string()),
+                        "args" => [
+                            "id" => Type::nonNull(Type::string()),
                         ],
-                        'resolve' => function ($root, $args) {
+                        "resolve" => function ($root, $args) {
                             $product = new \Models\Products\Product();
-                            return $product->getProductDetails($args['id']);
+                            return $product->getProductDetails($args["id"]);
                         },
                     ],
 
-                    'products' => [
+                    "products" => [
                         // This returns a list of Product objects (AbstractProduct subclasses)
-                        'type' => Type::listOf(
+                        "type" => Type::listOf(
                             new ObjectType([
-                                'name' => 'Product',
-                                'fields' => [
-                                    'id' => [
-                                        'type' => Type::id(),
-                                        'resolve' => function ($root) {
-                                            return $root->getDetails()['id'];
-                                        }
+                                "name" => "Product",
+                                "fields" => [
+                                    "id" => [
+                                        "type" => Type::id(),
+                                        "resolve" => function ($root) {
+                                            return $root->getDetails()["id"];
+                                        },
                                     ],
-                                    'name' => [
-                                        'type' => Type::string(),
-                                        'resolve' => function ($root) {
+                                    "name" => [
+                                        "type" => Type::string(),
+                                        "resolve" => function ($root) {
                                             // Either use getDetails() or direct properties
-                                            return $root->getDetails()['name'];
-                                        }
+                                            return $root->getDetails()["name"];
+                                        },
                                     ],
-                                    'price' => [
-                                        'type' => Type::float(),
-                                        'resolve' => function ($root) {
-                                            return $root->getDetails()['price'];
-                                        }
+                                    "price" => [
+                                        "type" => Type::float(),
+                                        "resolve" => function ($root) {
+                                            return $root->getDetails()["price"];
+                                        },
                                     ],
-                                    'currency' => [
-                                        'type' => new ObjectType([
-                                            'name' => 'currencies',
-                                            'fields' => [
-                                                'label' => [
-                                                    'type' => Type::string(),
-                                                    'resolve' => function ($root) {
-                                                        return $root['label'];
-                                                    }
+                                    "currency" => [
+                                        "type" => new ObjectType([
+                                            "name" => "currencies",
+                                            "fields" => [
+                                                "label" => [
+                                                    "type" => Type::string(),
+                                                    "resolve" => function (
+                                                        $root
+                                                    ) {
+                                                        return $root["label"];
+                                                    },
                                                 ],
-                                                'symbol' => [
-                                                    'type' => Type::string(),
-                                                    'resolve' => function ($root) {
-                                                        return $root['symbol'];
-                                                    }
+                                                "symbol" => [
+                                                    "type" => Type::string(),
+                                                    "resolve" => function (
+                                                        $root
+                                                    ) {
+                                                        return $root["symbol"];
+                                                    },
                                                 ],
-                                            ]
+                                            ],
                                         ]),
-                                        'resolve' => function ($root) {
+                                        "resolve" => function ($root) {
                                             $details = $root->getDetails();
                                             error_log(print_r($details, true)); // Debugging: Log the details
-                                            return $details['currency'];
-                                        }
+                                            return $details["currency"];
+                                        },
                                     ],
-                                    'images' => [
-                                        'type' => Type::listOf(Type::string()),
-                                        'resolve' => function ($root) {
-                                            return $root->getDetails()['images'];
-                                        }
+                                    "images" => [
+                                        "type" => Type::listOf(Type::string()),
+                                        "resolve" => function ($root) {
+                                            return $root->getDetails()[
+                                                "images"
+                                            ];
+                                        },
                                     ],
-                                    'category_name' => [
-                                        'type' => Type::string(),
-                                        'resolve' => function ($root) {
-                                            return $root->getDetails()['category_name'];
-                                        }
+                                    "category_name" => [
+                                        "type" => Type::string(),
+                                        "resolve" => function ($root) {
+                                            return $root->getDetails()[
+                                                "category_name"
+                                            ];
+                                        },
                                     ],
-                                    'in_stock' => [
-                                        'type' => Type::int(),
-                                        'resolve' => function ($root) {
-                                            return $root->getDetails()['in_stock'];
-                                        }
-                                    ]
-                                ]
+                                    "in_stock" => [
+                                        "type" => Type::int(),
+                                        "resolve" => function ($root) {
+                                            return $root->getDetails()[
+                                                "in_stock"
+                                            ];
+                                        },
+                                    ],
+                                ],
                             ])
                         ),
-                        'resolve' => function () {
+                        "resolve" => function () {
                             $product = new \Models\Products\Product();
                             return $product->getAllProducts();
                         },
@@ -145,15 +158,68 @@ class GraphQL
             ]);
 
             $mutationType = new ObjectType([
-                'name' => 'Mutation',
-                'fields' => [
-                    'sum' => [
-                        'type' => Type::int(),
-                        'args' => [
-                            'x' => ['type' => Type::int()],
-                            'y' => ['type' => Type::int()],
+                "name" => "Mutation",
+                "fields" => [
+                    "sum" => [
+                        "type" => Type::int(),
+                        "args" => [
+                            "x" => ["type" => Type::int()],
+                            "y" => ["type" => Type::int()],
                         ],
-                        'resolve' => static fn($calc, array $args): int => $args['x'] + $args['y'],
+                        "resolve" => static fn(
+                            $calc,
+                            array $args
+                        ): int => $args["x"] + $args["y"],
+                    ],
+                ],
+            ]);
+            $mutationType = new ObjectType([
+                "name" => "Mutation",
+                "fields" => [
+                    // Your existing mutations
+
+                    // Add the order mutation
+                    "createOrder" => [
+                        "type" => new ObjectType([
+                            "name" => "OrderResponse",
+                            "fields" => [
+                                "success" => Type::boolean(),
+                                "message" => Type::string(),
+                                "orderId" => Type::id(),
+                            ],
+                        ]),
+                        "args" => [
+                            "customerEmail" => Type::nonNull(Type::string()),
+                            "shippingAddress" => Type::nonNull(Type::string()),
+                            // Other order details
+                            "items" => Type::nonNull(
+                                Type::listOf(
+                                    new InputObjectType([
+                                        "name" => "OrderItemInput",
+                                        "fields" => [
+                                            "productId" => Type::nonNull(
+                                                Type::id()
+                                            ),
+                                            "quantity" => Type::nonNull(
+                                                Type::int()
+                                            ),
+
+                                        ],
+                                    ])
+                                )
+                            ),
+                        ],
+                        "resolve" => function ($root, $args) {
+                            // Create a new order using the Order model
+                            $orderModel = new \Models\Order();
+                            $orderId = $orderModel->createOrder($args);
+
+                            return [
+                                "success" => true,
+                                "message" => "Order created successfully",
+                                "orderId" => $orderId,
+                            ];
+                        },
                     ],
                 ],
             ]);
@@ -162,32 +228,43 @@ class GraphQL
             // https://webonyx.github.io/graphql-php/schema-definition/#configuration-options
             $schema = new Schema(
                 (new SchemaConfig())
-                    ->setQuery($queryType instanceof ObjectType ? $queryType : null)
-                    ->setMutation($mutationType instanceof ObjectType ? $mutationType : null)
+                    ->setQuery(
+                        $queryType instanceof ObjectType ? $queryType : null
+                    )
+                    ->setMutation(
+                        $mutationType instanceof ObjectType
+                            ? $mutationType
+                            : null
+                    )
             );
 
-            $rawInput = file_get_contents('php://input');
+            $rawInput = file_get_contents("php://input");
             if ($rawInput === false) {
-                throw new RuntimeException('Failed to get php://input');
+                throw new RuntimeException("Failed to get php://input");
             }
 
             $input = json_decode($rawInput, true);
-            $query = $input['query'];
-            $variableValues = $input['variables'] ?? null;
+            $query = $input["query"];
+            $variableValues = $input["variables"] ?? null;
 
-            $rootValue = ['prefix' => 'You said: '];
-            $result = GraphQLBase::executeQuery($schema, $query, $rootValue, null, $variableValues);
+            $rootValue = ["prefix" => "You said: "];
+            $result = GraphQLBase::executeQuery(
+                $schema,
+                $query,
+                $rootValue,
+                null,
+                $variableValues
+            );
             $output = $result->toArray();
         } catch (Throwable $e) {
             $output = [
-                'error' => [
-                    'message' => $e->getMessage(),
+                "error" => [
+                    "message" => $e->getMessage(),
                 ],
             ];
         }
 
-
-        header('Content-Type: application/json; charset=UTF-8');
+        header("Content-Type: application/json; charset=UTF-8");
         return json_encode($output);
     }
 }

@@ -68,3 +68,17 @@ CREATE TABLE IF NOT EXISTS attribute_items (
     value VARCHAR(255) NOT NULL,
     FOREIGN KEY (attribute_set_id) REFERENCES attribute_sets(id)
 );
+CREATE TABLE IF NOT EXISTS order_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity INT NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_email VARCHAR(255) NOT NULL,
+    shipping_address TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

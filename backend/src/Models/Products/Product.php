@@ -2,7 +2,7 @@
 namespace Models\Products;
 
 
-use Config\Database;
+use App\Config\Database;
 use Models\Products\ProductFactory;
 
 /**
