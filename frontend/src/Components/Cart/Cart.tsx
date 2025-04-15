@@ -1,7 +1,7 @@
 import { useCart } from "./CartContext";
 import { useState } from "react";
 
-const CartOverlay = () => {
+const CartOverlay = ({ onClose }: { onClose: () => void }) => {
   const { state, dispatch } = useCart();
   const [hoveredSizeIndex, setHoveredSizeIndex] = useState<{
     itemId: string;
@@ -42,9 +42,16 @@ const CartOverlay = () => {
   };
 
   return (
-    <div className="fixed top-10 flex justify-end z-10 right-20 ">
+    <>
+      {/* Grey overlay that covers everything except header */}
+      <div
+        className="fixed inset-0 top-16 z-10"
+        style={{ backgroundColor: "rgba(0, 0, 0, 0.25)" }}
+        onClick={onClose}
+      />
+
       {/* Cart content */}
-      <div className="relative w-96 bg-white max-h-screen p-4 shadow-lg z-20 flex flex-col">
+      <div className="fixed top-16 right-0 w-96 bg-white max-h-[calc(100vh-4rem)] p-4 shadow-lg z-20 flex flex-col">
         <h2 className="text-lg font-semibold mb-4">
           My Bag, {state.items.length}{" "}
           {state.items.length === 1 ? "Item" : "Items"}
@@ -73,7 +80,10 @@ const CartOverlay = () => {
                 >
                   +
                 </button>
-                <span data-testid="cart-item-amount" className="text-center py-1">
+                <span
+                  data-testid="cart-item-amount"
+                  className="text-center py-1"
+                >
                   {item.quantity}
                 </span>
                 <button
@@ -101,10 +111,7 @@ const CartOverlay = () => {
 
                 {/* Size attribute */}
                 {item.attributes?.some((attr) => attr.name === "Size") && (
-                  <div 
-                    data-testid="cart-itemattribute-size"
-                    className="mt-2"
-                  >
+                  <div data-testid="cart-itemattribute-size" className="mt-2">
                     <p className="text-xs font-medium mb-1">SIZE:</p>
                     <div className="flex gap-1">
                       {item.attributes
@@ -114,8 +121,8 @@ const CartOverlay = () => {
                             <button
                               data-testid={
                                 item.selectedSize === sizeItem.value
-                                  ? `cart-itemattribute-size-${sizeItem.value.toLowerCase().replace(/\s+/g, '-')}-selected`
-                                  : `cart-itemattribute-size-${sizeItem.value.toLowerCase().replace(/\s+/g, '-')}`
+                                  ? `cart-itemattribute-size-${sizeItem.value.toLowerCase().replace(/\s+/g, "-")}-selected`
+                                  : `cart-itemattribute-size-${sizeItem.value.toLowerCase().replace(/\s+/g, "-")}`
                               }
                               className={`w-6 h-6 flex items-center justify-center border text-xs ${
                                 item.selectedSize === sizeItem.value
@@ -153,10 +160,7 @@ const CartOverlay = () => {
 
                 {/* Color attribute */}
                 {item.attributes?.some((attr) => attr.name === "Color") && (
-                  <div 
-                    data-testid="cart-itemattribute-color"
-                    className="mt-2"
-                  >
+                  <div data-testid="cart-itemattribute-color" className="mt-2">
                     <p className="text-xs font-medium mb-1">COLOR:</p>
                     <div className="flex gap-1">
                       {item.attributes
@@ -166,8 +170,8 @@ const CartOverlay = () => {
                             key={colorItem.value}
                             data-testid={
                               item.selectedColor === colorItem.value
-                                ? `cart-itemattribute-color-${colorItem.value.toLowerCase().replace(/\s+/g, '-')}-selected`
-                                : `cart-itemattribute-color-${colorItem.value.toLowerCase().replace(/\s+/g, '-')}`
+                                ? `cart-itemattribute-color-${colorItem.value.toLowerCase().replace(/\s+/g, "-")}-selected`
+                                : `cart-itemattribute-color-${colorItem.value.toLowerCase().replace(/\s+/g, "-")}`
                             }
                             className={`w-5 h-5 rounded-sm ${
                               item.selectedColor === colorItem.value
@@ -219,7 +223,7 @@ const CartOverlay = () => {
           </button>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -10,20 +10,18 @@ interface HeaderProps {
   setActiveCategory: (category: string) => void;
 }
 
-/**
- * Header component that displays the logo, collection buttons, and cart button.
- * @param {string} activeCategory - The currently active category.
- * @param {function} setActiveCategory - Function to set the active category.
- */
-
 const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
   const categories = ["All", "Clothes", "Tech"];
   const [isCartOpen, setIsCartOpen] = useState(false);
   const { state } = useCart();
   const totalItems = state.items.reduce((sum, item) => sum + item.quantity, 0);
 
+  const handleCartClose = () => {
+    setIsCartOpen(false);
+  };
+
   return (
-    <header className="bg-white h-16 relative w-full">
+    <header className="bg-white h-16 fixed w-full z-20">
       <div className="container mx-auto flex items-center justify-between py-3 px-20">
         {/* Collection buttons */}
         <div className="collections flex space-x-4 gap-4">
@@ -49,18 +47,15 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
         </div>
 
         {/* Logo */}
-
         <div className="logo absolute left-1/2 transform -translate-x-1/2">
           <Link to="/">
-            {" "}
-            {/* Wrap the logo in a Link component */}
             <img src={logo} alt="Logo" className="h-8 cursor-pointer" />
           </Link>
         </div>
 
         {/* Cart button */}
         <button
-          className="text-gray-700 hover:text-gray-900 cursor-pointer "
+          className="text-gray-700 hover:text-gray-900 cursor-pointer"
           data-testid="cart-btn"
           onClick={() => {
             setIsCartOpen(!isCartOpen);
@@ -77,11 +72,9 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
           </div>
         </button>
       </div>
-      {isCartOpen && (
-        <div className="fixed right-0 flex justify-end z-10">
-          <CartOverlay />
-        </div>
-      )}
+
+      {/* Cart overlay with backdrop */}
+      {isCartOpen && <CartOverlay onClose={handleCartClose} />}
     </header>
   );
 };
