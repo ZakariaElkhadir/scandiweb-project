@@ -1,7 +1,22 @@
 import { useCart } from "./CartContext";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 const CartOverlay = ({ onClose }: { onClose: () => void }) => {
+  const CREATE_ORDER_MUTATION = `
+    mutation CreateOrder($customerEmail: String!, $shippingAddress: String!, $items: [OrderItemInput!]!) {
+      createOrder(
+        customerEmail: $customerEmail,
+        shippingAddress: $shippingAddress,
+        items: $items
+      ) {
+        success
+        message
+        orderId
+      }
+    }
+  `;
+
   const { state, dispatch } = useCart();
   const [hoveredSizeIndex, setHoveredSizeIndex] = useState<{
     itemId: string;
@@ -10,7 +25,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
 
   const totalPrice = state.items.reduce(
     (sum, item) => sum + (item.price || 0) * item.quantity,
-    0
+    0,
   );
 
   // Abbreviated size label helper function
@@ -29,7 +44,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
   const handleAttributeChange = (
     itemId: string,
     attributeName: string,
-    value: string
+    value: string,
   ) => {
     dispatch({
       type: "UPDATE_ITEM_ATTRIBUTES",
@@ -39,6 +54,61 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
         value,
       },
     });
+  };
+  const handleCheckout = async () => {
+    const orderItems = state.items.map((item) => ({
+      productId: item.id,
+      quantity: item.quantity,
+    }));
+
+    try {
+      const res = await fetch("/graphql", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query: CREATE_ORDER_MUTATION,
+          variables: {
+            customerEmail: "zakaria@gmail.com",
+            shippingAddress: "123 Morocco Casablanca",
+            items: orderItems,
+          },
+        }),
+      });
+
+      const json = await res.json();
+
+      if (json.data && json.data.createOrder) {
+        const { success, message, orderId } = json.data.createOrder;
+
+        if (success) {
+          toast.success(`Order #${orderId} placed successfully!`);
+          state.items.forEach((item) => {
+            dispatch({
+              type: "UPDATE_ITEM",
+              payload: {
+                id: item.id,
+                cartItemId: item.cartItemId,
+                quantity: 0,
+              },
+            });
+          });
+          onClose();
+        } else {
+          toast.error("Failed to place order: " + message);
+        }
+      } else if (json.errors) {
+        alert("GraphQL Error: " + json.errors[0].message);
+        console.error("GraphQL Errors:", json.errors);
+      } else {
+        alert("Unknown error occurred");
+        console.error("Unexpected response:", json);
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+      alert("An unexpected error occurred. Please try again.");
+    }
   };
 
   return (
@@ -139,7 +209,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                                 handleAttributeChange(
                                   item.id,
                                   "Size",
-                                  sizeItem.value
+                                  sizeItem.value,
                                 )
                               }
                               onMouseEnter={() =>
@@ -193,7 +263,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                               handleAttributeChange(
                                 item.id,
                                 "Color",
-                                colorItem.value
+                                colorItem.value,
                               )
                             }
                             title={colorItem.display_value}
@@ -223,11 +293,11 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
           <button
             className={`w-full py-2 ${
               state.items.length > 0
-                ? "bg-green-500 text-white"
+                ? "bg-green-500 text-white cursor-pointer"
                 : "bg-gray-400 text-gray-700 cursor-not-allowed"
             }`}
             disabled={state.items.length === 0}
-            onClick={() => console.log("Place Order")}
+            onClick={handleCheckout}
           >
             Checkout
           </button>

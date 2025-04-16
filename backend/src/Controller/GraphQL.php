@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
@@ -160,25 +161,6 @@ class GraphQL
             $mutationType = new ObjectType([
                 "name" => "Mutation",
                 "fields" => [
-                    "sum" => [
-                        "type" => Type::int(),
-                        "args" => [
-                            "x" => ["type" => Type::int()],
-                            "y" => ["type" => Type::int()],
-                        ],
-                        "resolve" => static fn(
-                            $calc,
-                            array $args
-                        ): int => $args["x"] + $args["y"],
-                    ],
-                ],
-            ]);
-            $mutationType = new ObjectType([
-                "name" => "Mutation",
-                "fields" => [
-                    // Your existing mutations
-
-                    // Add the order mutation
                     "createOrder" => [
                         "type" => new ObjectType([
                             "name" => "OrderResponse",
@@ -203,7 +185,6 @@ class GraphQL
                                             "quantity" => Type::nonNull(
                                                 Type::int()
                                             ),
-
                                         ],
                                     ])
                                 )
