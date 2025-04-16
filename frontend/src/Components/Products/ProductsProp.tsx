@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { ShoppingCart, Maximize } from "lucide-react";
 import fallbackImage from "../../assets/images/fallback.jpg";
 
-
 interface ProductProps {
   id: string;
   imageUrl: string;
@@ -30,7 +29,7 @@ interface ProductProps {
  * @param {string} props.imageUrl - The URL of the product's image.
  * @param {number} props.inStock - The stock availability of the product. A value of 0 indicates out of stock.
  * @param {string} [props.currency] - The currency symbol for the product price. Defaults to "USD" if undefined.
- * @param {Array<{ name: string; items: Array<{ id: string; value: string }> }>} [props.attributes=[]] - 
+ * @param {Array<{ name: string; items: Array<{ id: string; value: string }> }>} [props.attributes=[]] -
  * An array of product attributes, such as size or color, that may require user selection.
  *
  * @returns {JSX.Element} A JSX element representing the product card.
@@ -50,11 +49,9 @@ const ProductsCard = ({
   currency,
   attributes = [],
 }: ProductProps) => {
- // Access the dispatch function from the CartContext
-
   // Check if product has attributes that require selection (like size or color)
   const hasRequiredAttributes = attributes.some(
-    (attr) => ["Size", "Color"].includes(attr.name) && attr.items.length > 0
+    (attr) => ["Size", "Color"].includes(attr.name) && attr.items.length > 0,
   );
 
   // const handleAddToCart = (e: React.MouseEvent) => {
@@ -125,7 +122,7 @@ const ProductsCard = ({
               {hasRequiredAttributes ? (
                 <button
                   onClick={(e) => {
-                    e.preventDefault(); // Let the Link handle navigation
+                    e.preventDefault(); // the Link handle navigation
                   }}
                   className="bg-blue-500 hover:bg-blue-600 text-white
                        rounded-full w-10 h-10 flex items-center justify-center shadow-lg"
@@ -136,7 +133,6 @@ const ProductsCard = ({
               ) : (
                 /* Add to cart button for products without required attributes */
                 <button
-                  
                   className="bg-green-500 hover:bg-green-600 text-white
                        rounded-full w-10 h-10 flex items-center justify-center shadow-lg"
                   aria-label="Add to cart"
@@ -151,13 +147,6 @@ const ProductsCard = ({
           {inStock === 0 && (
             <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 text-white px-2 py-1 rounded">
               Out of Stock
-            </span>
-          )}
-
-          {/* Optional: Show a "Select Options" label for products with attributes */}
-          {hasRequiredAttributes && inStock !== 0 && (
-            <span className="absolute bottom-0 left-0 bg-gray-800 text-white text-xs px-2 py-1">
-              Select Options
             </span>
           )}
         </div>

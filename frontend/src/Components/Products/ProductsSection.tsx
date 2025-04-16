@@ -1,5 +1,4 @@
 import ProductsCard from "./ProductsProp";
-
 import { gql, useQuery } from "@apollo/client";
 
 interface Product {
@@ -14,12 +13,15 @@ interface Product {
     symbol: string;
   };
 }
+
 interface GetProductsData {
   products: Product[];
 }
+
 interface ProductsSectionProps {
   activeCategory: string;
 }
+
 const ProductsSection = ({ activeCategory }: ProductsSectionProps) => {
   const GET_PRODUCTS = gql`
     query GetProductsQuery {
@@ -39,25 +41,13 @@ const ProductsSection = ({ activeCategory }: ProductsSectionProps) => {
   `;
   const { loading, error, data } = useQuery<GetProductsData>(GET_PRODUCTS);
 
-  // useEffect(() => {
-  //   axios
-  //     .get<Product[]>(
-  //       import.meta.env.VITE_APP_API_URL || "http://localhost:8000/api/products"
-  //     )
-  //     .then((response: { data: Product[] }) => {
-  //       console.log("Products fetched successfully:", response.data);
-  //       setProducts(response.data);
-  //       setLoading(false);
-  //     })
-  //     .catch((error: unknown) => {
-  //       console.error("Error fetching products:", error);
-  //       setLoading(false);
-  //     });
-  // }, []);
   //--- Loading State ---
   if (loading) {
     return (
-      <div role="status" className="flex justify-center items-center h-screen">
+      <div
+        role="status"
+        className="flex justify-center items-center h-[calc(100vh-64px)] mt-16"
+      >
         <svg
           aria-hidden="true"
           className="inline w-10 h-10 text-gray-200 animate-spin dark:text-gray-600 fill-[#5ECE7B]"
@@ -78,11 +68,12 @@ const ProductsSection = ({ activeCategory }: ProductsSectionProps) => {
       </div>
     );
   }
+
   // --- Error State ---
   if (error) {
     console.error("Error fetching products:", error);
     return (
-      <div className="text-center text-red-500 p-4">
+      <div className="text-center text-red-500 p-4 mt-16">
         Error loading products. Please try again later.
         <pre className="text-xs text-left whitespace-pre-wrap">
           {error.message}
@@ -90,6 +81,7 @@ const ProductsSection = ({ activeCategory }: ProductsSectionProps) => {
       </div>
     );
   }
+
   const products = data?.products ?? [];
   const filteredProducts =
     activeCategory.toLowerCase() === "all"
@@ -101,9 +93,12 @@ const ProductsSection = ({ activeCategory }: ProductsSectionProps) => {
         );
 
   return (
-    <section className="mr-22 ml-22">
-      <h2 className="text-2xl capitalize">{activeCategory}</h2>
-      <div className="mt-9 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3  gap-6">
+    <section className="px-4 sm:px-6 md:px-8 lg:px-16 xl:px-22 mt-16 pb-12">
+      <h2 className="text-xl sm:text-2xl capitalize font-medium pt-4">
+        {activeCategory}
+      </h2>
+
+      <div className="mt-6 sm:mt-9 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 justify-items-center sm:justify-items-start">
         {filteredProducts.length > 0
           ? filteredProducts.map((product) => (
               <ProductsCard
@@ -122,6 +117,7 @@ const ProductsSection = ({ activeCategory }: ProductsSectionProps) => {
                 </p>
               </div>
             )}
+
         {products.length === 0 &&
           activeCategory.toLowerCase() === "all" &&
           !loading && (

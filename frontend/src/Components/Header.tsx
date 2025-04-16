@@ -1,7 +1,7 @@
 import logo from "../assets/logo.png";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Menu, X } from "lucide-react";
 import CartOverlay from "./Cart/Cart";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "./Cart/CartContext";
 
@@ -13,18 +13,52 @@ interface HeaderProps {
 const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
   const categories = ["All", "Clothes", "Tech"];
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { state } = useCart();
   const totalItems = state.items.reduce((sum, item) => sum + item.quantity, 0);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768 && isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [isMobileMenuOpen]);
+
+  // Close overlays when clicking outside
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (isMobileMenuOpen && !target.closest(".mobile-menu-container")) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, [isMobileMenuOpen]);
 
   const handleCartClose = () => {
     setIsCartOpen(false);
   };
 
   return (
-    <header className="bg-white h-16 fixed w-full z-20">
-      <div className="container mx-auto flex items-center justify-between py-3 px-20">
-        {/* Collection buttons */}
-        <div className="collections flex space-x-4 gap-4">
+    <header className="bg-white h-16 fixed w-full z-20 shadow-sm">
+      <div className="container mx-auto flex items-center justify-between h-full py-3 px-4 sm:px-6 md:px-8 lg:px-20">
+        {/* Mobile hamburger menu */}
+        <button
+          className="text-gray-700 md:hidden"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+        >
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+
+        {/* Collection buttons - desktop */}
+        <div className="collections hidden md:flex space-x-4 gap-4">
           {categories.map((category) => (
             <button
               key={category}
@@ -47,7 +81,7 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
         </div>
 
         {/* Logo */}
-        <div className="logo absolute left-1/2 transform -translate-x-1/2">
+        <div className="logo mx-auto md:absolute md:left-1/2 md:transform md:-translate-x-1/2">
           <Link to="/">
             <img src={logo} alt="Logo" className="h-8 cursor-pointer" />
           </Link>
@@ -60,6 +94,7 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
           onClick={() => {
             setIsCartOpen(!isCartOpen);
           }}
+          aria-label="Shopping cart"
         >
           <div className="flex relative">
             <ShoppingCart />
@@ -72,6 +107,31 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
           </div>
         </button>
       </div>
+
+      {/* Mobile menu overlay */}
+      {isMobileMenuOpen && (
+        <div className="mobile-menu-container fixed inset-0 bg-white z-30 pt-16 px-4">
+          <div className="flex flex-col space-y-6 mt-8">
+            {categories.map((category) => (
+              <button
+                key={category}
+                className={`text-gray-700 text-xl hover:text-gray-900 uppercase cursor-pointer relative ${
+                  activeCategory === category ? "font-medium" : ""
+                }`}
+                onClick={() => {
+                  setActiveCategory(category);
+                  setIsMobileMenuOpen(false);
+                }}
+              >
+                {category}
+                {activeCategory === category && (
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-green-500 -mb-2"></div>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Cart overlay with backdrop */}
       {isCartOpen && <CartOverlay onClose={handleCartClose} />}
