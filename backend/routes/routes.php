@@ -1,25 +1,35 @@
 <?php
 use Controller\ProductsController;
 
-// Load Composer autoloader (better than manual requires)
+// Load Composer autoloader
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $router = new \Bramus\Router\Router();
 
 // CORS Middleware
 $router->before('GET|POST|OPTIONS', '/.*', function () {
-    header("Access-Control-Allow-Origin: http://localhost:5173");
+    $allowedOrigins = [
+        'http://localhost:5173', // Local dev
+        'https://scandiweb-test-five.vercel.app' // Production
+    ];
+
+    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+    
+    if (in_array($origin, $allowedOrigins)) {
+        header("Access-Control-Allow-Origin: $origin");
+    }
+    
     header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
     header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
-
+    header("Access-Control-Allow-Credentials: true");
+    
     // Handle preflight OPTIONS request
-    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-        http_response_code(200);
+    if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
         exit;
     }
 });
 
-// routes
+// Routes
 $router->get('/api/products', function() {
     $controller = new ProductsController();
     $controller->getAllProduct();
