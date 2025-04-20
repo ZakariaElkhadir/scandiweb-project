@@ -8,6 +8,7 @@ const client = new ApolloClient({
     ? "/graphql"
     : `${import.meta.env.VITE_BACKEND_URL}/graphql`,
   cache: new InMemoryCache(),
+  credentials: "include", 
 });
 createRoot(document.getElementById("root")!).render(
   <ApolloProvider client={client}>
