@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { CartProvider } from "./Components/Cart/CartContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import './index.css'
 
 function App() {
   const [activeCategory, setActiveCategory] = useState("All");

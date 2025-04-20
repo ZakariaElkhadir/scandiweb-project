@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useCart } from "../Cart/CartContext";
 import { toast } from "react-toastify";
 import { ArrowRight, ArrowLeft } from "lucide-react";
+import parse from "html-react-parser";
 
 interface ProductDetailsProps {
   product: {
@@ -30,12 +31,12 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
   const [selectedColor, setSelectedColor] = useState("");
   const [hoveredSizeIndex, setHoveredSizeIndex] = useState<number | null>(null);
   const [showAllThumbnails, setShowAllThumbnails] = useState(false);
-  const { dispatch } = useCart();
+  const { dispatch} = useCart();
 
   // Find size and color attributes
   const sizeAttribute = product.attributes.find((attr) => attr.name === "Size");
   const colorAttribute = product.attributes.find(
-    (attr) => attr.name === "Color",
+    (attr) => attr.name === "Color"
   );
 
   // Abbreviated size label
@@ -58,6 +59,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
     : product.images.slice(0, 4);
 
   // Add to cart handler
+
   const handleAddToCart = () => {
     if ((product.in_stock ?? 0) <= 0) {
       toast.error(`${product.name} is out of stock`);
@@ -165,7 +167,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
               <button
                 onClick={() =>
                   setSelectedImage((prev) =>
-                    prev > 0 ? prev - 1 : product.images.length - 1,
+                    prev > 0 ? prev - 1 : product.images.length - 1
                   )
                 }
                 className="rounded-sm p-2 shadow-md cursor-pointer"
@@ -179,7 +181,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
               <button
                 onClick={() =>
                   setSelectedImage((prev) =>
-                    prev < product.images.length - 1 ? prev + 1 : 0,
+                    prev < product.images.length - 1 ? prev + 1 : 0
                   )
                 }
                 className="rounded-sm p-2 shadow-md cursor-pointer"
@@ -302,8 +304,9 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
         <div
           className="text-xs sm:text-sm prose max-w-none text-gray-500 mt-6 overflow-auto"
           data-testid="product-description"
-          dangerouslySetInnerHTML={{ __html: product.description }}
-        />
+        >
+          {parse(product.description)}
+        </div>
       </div>
     </div>
   );
