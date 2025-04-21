@@ -10,6 +10,7 @@ interface CartItem {
   quantity: number;
   selectedSize?: string;
   selectedColor?: string;
+  selectedCapacity?: string;
   attributes?: {
     name: string;
     items: {
@@ -18,6 +19,7 @@ interface CartItem {
     }[];
   }[];
   cartItemId?: string;
+  [key: string]: any; // Allow for dynamic attribute properties
 }
 
 interface CartState {
@@ -45,23 +47,36 @@ const CartContext = createContext<{
   dispatch: React.Dispatch<CartAction>;
 } | null>(null);
 
+// Helper function to convert attribute name to camelCase selected property
+const attributeNameToProperty = (attributeName: string): string => {
+  if (attributeName === "Size") return "selectedSize";
+  if (attributeName === "Color") return "selectedColor";
+  if (attributeName === "Capacity") return "selectedCapacity";
+  // For other attributes, convert to camelCase
+  return `selected${attributeName.charAt(0).toUpperCase() + attributeName.slice(1)}`;
+};
+
+// Generate a unique ID for cart items based on all selected attributes
+const generateCartItemId = (item: CartItem): string => {
+  // Start with the product ID
+  let idParts = [item.id];
+  
+  // Find all selected attribute properties
+  const attributeProps = Object.keys(item).filter(key => key.startsWith('selected') && item[key]);
+  
+  // Sort to ensure consistent ID generation
+  attributeProps.sort();
+  
+  // Add each selected attribute to the ID
+  attributeProps.forEach(prop => {
+    idParts.push(`${prop}:${item[prop]}`);
+  });
+  
+  return idParts.join('_');
+};
+
 /**
  * Reducer function to manage the state of the shopping cart.
- *
- * @param state - The current state of the cart, containing an array of cart items.
- * @param action - The action to be performed on the cart state, including type and payload.
- * @returns The updated cart state after applying the specified action.
- *
- * Actions:
- * - `"ADD_ITEM"`: Adds a new item or an array of items to the cart. If the item already exists
- *   (based on `cartItemId`), it updates the quantity. Generates unique `cartItemId` for items
- *   based on product ID and selected attributes.
- * - `"UPDATE_ITEM"`: Updates the quantity of an item in the cart. Matches items using `cartItemId`
- *   (if provided) or falls back to `id`. Automatically removes items with a quantity of 0.
- * - `"UPDATE_ITEM_ATTRIBUTES"`: Updates the attributes (e.g., size, color) of an item in the cart.
- *   Generates a new `cartItemId` for the updated attributes. If an item with the same attributes
- *   already exists, it merges the quantities and removes the original item.
- *
  */
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
@@ -76,7 +91,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
         return { items: [...state.items, ...itemsWithIds] };
       }
 
-      // Generate a unique ID for this item based on product ID and selected attributes
+      // Generate a unique ID for this item based on product ID and all selected attributes
       const newItem = {
         ...action.payload,
         cartItemId: generateCartItemId(action.payload),
@@ -128,11 +143,10 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 
       // Create a copy of the item with updated attribute
       const updatedItem = { ...itemToUpdate };
-      if (attributeName === "Size") {
-        updatedItem.selectedSize = value;
-      } else if (attributeName === "Color") {
-        updatedItem.selectedColor = value;
-      }
+      
+      // Convert attribute name to property name and update
+      const propertyName = attributeNameToProperty(attributeName);
+      updatedItem[propertyName] = value;
 
       // Generate a new cart item ID with the updated attributes
       updatedItem.cartItemId = generateCartItemId(updatedItem);
@@ -176,11 +190,6 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
     default:
       return state;
   }
-};
-const generateCartItemId = (item: CartItem): string => {
-  return `${item.id}_${item.selectedSize || "nosize"}_${
-    item.selectedColor || "nocolor"
-  }`;
 };
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({

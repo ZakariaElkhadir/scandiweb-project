@@ -55,6 +55,19 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
       },
     });
   };
+
+  // Helper to get selected attribute value
+  const getSelectedAttributeValue = (item: any, attributeName: string) => {
+    // Handle specific attribute types
+    if (attributeName === "Size") return item.selectedSize;
+    if (attributeName === "Color") return item.selectedColor;
+    if (attributeName === "Capacity") return item.selectedCapacity;
+    
+    // Handle other attributes by checking the camelCased properties
+    const camelCaseKey = `selected${attributeName.charAt(0).toUpperCase() + attributeName.slice(1)}`;
+    return item[camelCaseKey];
+  };
+
   const handleCheckout = async () => {
     const orderItems = state.items.map((item) => ({
       productId: item.id,
@@ -121,167 +134,212 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
       />
 
       {/* Cart content */}
-      <div className="fixed top-16 right-0 w-96 bg-white max-h-[calc(100vh-4rem)] p-4 shadow-lg z-20 flex flex-col"
-      data-testid="cart-overlay">
+      <div 
+        className="fixed top-16 right-0 w-96 bg-white max-h-[calc(100vh-4rem)] p-4 shadow-lg z-20 flex flex-col"
+        data-testid="cart-overlay"
+      >
         <h2 className="text-lg font-semibold mb-4">
           My Bag, {state.items.length}{" "}
           {state.items.length === 1 ? "Item" : "Items"}
         </h2>
         <div className="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto">
-          {state.items.map((item) => (
-            <div
-              key={`${item.id}-${item.selectedSize || "default"}-${
-                item.selectedColor || "default"
-              }`}
-              className="flex gap-4 pb-4 border-b border-gray-200"
-            >
-              <div className="flex flex-col justify-between">
-                <button
-                  data-testid="cart-item-amountincrease"
-                  className="w-6 h-6 border border-gray-200 flex items-center justify-center text-lg"
-                  onClick={() =>
-                    dispatch({
-                      type: "UPDATE_ITEM",
-                      payload: {
-                        id: item.id,
-                        cartItemId: item.cartItemId,
-                        quantity: item.quantity + 1,
-                      },
-                    })
-                  }
-                >
-                  +
-                </button>
-                <span
-                  data-testid="cart-item-amount"
-                  className="text-center py-1"
-                >
-                  {item.quantity}
-                </span>
-                <button
-                  data-testid="cart-item-amountdecrease"
-                  className="w-6 h-6 border border-gray-200 flex items-center justify-center text-lg"
-                  onClick={() =>
-                    dispatch({
-                      type: "UPDATE_ITEM",
-                      payload: {
-                        id: item.id,
-                        cartItemId: item.cartItemId,
-                        quantity: Math.max(0, item.quantity - 1),
-                      },
-                    })
-                  }
-                >
-                  -
-                </button>
-              </div>
+          {state.items.map((item) => {
+            // Process attributes to avoid duplicates
+            const uniqueAttributes = item.attributes ? 
+              // Create an object to hold unique attributes by name
+              item.attributes.reduce((uniqueAttrs: Record<string, any>, attr) => {
+                const lowerName = attr.name.toLowerCase();
+                // Only add if not already present
+                if (!uniqueAttrs[lowerName]) {
+                  uniqueAttrs[lowerName] = attr;
+                }
+                return uniqueAttrs;
+              }, {}) : {};
 
-              <div className="flex-1">
-                <h3 className="text-sm font-medium">{item.name}</h3>
-                <p className="text-sm font-medium mt-1">
-                  {item.currency} {(item.price || 0).toFixed(2)}
-                </p>
+            return (
+              <div
+                key={item.cartItemId}
+                className="flex gap-4 pb-4 border-b border-gray-200"
+              >
+                <div className="flex flex-col justify-between">
+                  <button
+                    data-testid="cart-item-amountincrease"
+                    className="w-6 h-6 border border-gray-200 flex items-center justify-center text-lg"
+                    onClick={() =>
+                      dispatch({
+                        type: "UPDATE_ITEM",
+                        payload: {
+                          id: item.id,
+                          cartItemId: item.cartItemId,
+                          quantity: item.quantity + 1,
+                        },
+                      })
+                    }
+                  >
+                    +
+                  </button>
+                  <span
+                    data-testid="cart-item-amount"
+                    className="text-center py-1"
+                  >
+                    {item.quantity}
+                  </span>
+                  <button
+                    data-testid="cart-item-amountdecrease"
+                    className="w-6 h-6 border border-gray-200 flex items-center justify-center text-lg"
+                    onClick={() =>
+                      dispatch({
+                        type: "UPDATE_ITEM",
+                        payload: {
+                          id: item.id,
+                          cartItemId: item.cartItemId,
+                          quantity: Math.max(0, item.quantity - 1),
+                        },
+                      })
+                    }
+                  >
+                    -
+                  </button>
+                </div>
 
-                {/* Size attribute */}
-                {item.attributes?.some((attr) => attr.name === "Size") && (
-                  <div data-testid="cart-itemattribute-size" className="mt-2">
-                    <p className="text-xs font-medium mb-1">SIZE:</p>
-                    <div className="flex gap-1">
-                      {item.attributes
-                        .find((attr) => attr.name === "Size")
-                        ?.items.map((sizeItem, index) => (
-                          <div key={sizeItem.value} className="relative">
+                <div className="flex-1">
+                  <h3 className="text-sm font-medium">{item.name}</h3>
+                  <p className="text-sm font-medium mt-1">
+                    {item.currency} {(item.price || 0).toFixed(2)}
+                  </p>
+
+                  {/* Render unique attributes */}
+                  {Object.values(uniqueAttributes).map((attr: any) => {
+                    const attrName = attr.name;
+                    const attrNameLower = attrName.toLowerCase();
+                    const selectedValue = getSelectedAttributeValue(item, attrName);
+                    
+                    return (
+                      <div 
+                        key={attrName}
+                        data-testid={`cart-itemattribute-${attrNameLower}`} 
+                        className="mt-2"
+                      >
+                        <p className="text-xs font-medium mb-1">{attrName.toUpperCase()}:</p>
+                        
+                        <div className="flex gap-1">
+                          {/* For Size attributes */}
+                          {attrNameLower === "size" && attr.items.map((sizeItem: any, index: number) => (
+                            <div key={sizeItem.value} className="relative">
+                              <button
+                                data-testid={
+                                  selectedValue === sizeItem.value
+                                    ? `cart-itemattribute-size-${sizeItem.value
+                                        .toLowerCase()
+                                        .replace(/\s+/g, "-")}-selected`
+                                    : `cart-itemattribute-size-${sizeItem.value
+                                        .toLowerCase()
+                                        .replace(/\s+/g, "-")}`
+                                }
+                                className={`w-6 h-6 flex items-center justify-center border text-xs ${
+                                  selectedValue === sizeItem.value
+                                    ? "border-black bg-black text-white"
+                                    : "border-gray-300"
+                                }`}
+                                onClick={() =>
+                                  handleAttributeChange(
+                                    item.id,
+                                    attrName,
+                                    sizeItem.value,
+                                  )
+                                }
+                                onMouseEnter={() =>
+                                  setHoveredSizeIndex({ itemId: item.id, index })
+                                }
+                                onMouseLeave={() => setHoveredSizeIndex(null)}
+                              >
+                                {getSizeAbbreviation(sizeItem.display_value)}
+                              </button>
+
+                              {/* Tooltip */}
+                              {hoveredSizeIndex?.itemId === item.id &&
+                                hoveredSizeIndex?.index === index && (
+                                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 px-1.5 py-0.5 bg-black text-white text-xs rounded whitespace-nowrap z-30">
+                                    {sizeItem.display_value}
+                                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-2 border-transparent border-t-black"></div>
+                                  </div>
+                                )}
+                            </div>
+                          ))}
+                          
+                          {/* For Color attributes */}
+                          {attrNameLower === "color" && attr.items.map((colorItem: any) => (
                             <button
+                              key={colorItem.value}
                               data-testid={
-                                item.selectedSize === sizeItem.value
-                                  ? `cart-itemattribute-size-${sizeItem.value
+                                selectedValue === colorItem.value
+                                  ? `cart-itemattribute-color-${colorItem.value
                                       .toLowerCase()
                                       .replace(/\s+/g, "-")}-selected`
-                                  : `cart-itemattribute-size-${sizeItem.value
+                                  : `cart-itemattribute-color-${colorItem.value
                                       .toLowerCase()
                                       .replace(/\s+/g, "-")}`
                               }
-                              className={`w-6 h-6 flex items-center justify-center border text-xs ${
-                                item.selectedSize === sizeItem.value
+                              className={`w-5 h-5 rounded-sm ${
+                                selectedValue === colorItem.value
+                                  ? "ring-1 ring-black ring-offset-1"
+                                  : ""
+                              }`}
+                              style={{ backgroundColor: colorItem.value }}
+                              onClick={() =>
+                                handleAttributeChange(
+                                  item.id,
+                                  attrName,
+                                  colorItem.value,
+                                )
+                              }
+                              title={colorItem.display_value}
+                            />
+                          ))}
+                          
+                          {/* For other attributes (like Capacity) */}
+                          {attrNameLower !== "size" && attrNameLower !== "color" && attr.items.map((attrItem: any) => (
+                            <button
+                              key={attrItem.value}
+                              data-testid={
+                                selectedValue === attrItem.value
+                                  ? `cart-itemattribute-${attrNameLower}-${attrItem.value
+                                      .toLowerCase()
+                                      .replace(/\s+/g, "-")}-selected`
+                                  : `cart-itemattribute-${attrNameLower}-${attrItem.value
+                                      .toLowerCase()
+                                      .replace(/\s+/g, "-")}`
+                              }
+                              className={`px-2 py-1 border text-xs ${
+                                selectedValue === attrItem.value
                                   ? "border-black bg-black text-white"
                                   : "border-gray-300"
                               }`}
                               onClick={() =>
                                 handleAttributeChange(
                                   item.id,
-                                  "Size",
-                                  sizeItem.value,
+                                  attrName,
+                                  attrItem.value,
                                 )
                               }
-                              onMouseEnter={() =>
-                                setHoveredSizeIndex({ itemId: item.id, index })
-                              }
-                              onMouseLeave={() => setHoveredSizeIndex(null)}
                             >
-                              {getSizeAbbreviation(sizeItem.display_value)}
+                              {attrItem.display_value}
                             </button>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
 
-                            {/* Tooltip */}
-                            {hoveredSizeIndex?.itemId === item.id &&
-                              hoveredSizeIndex?.index === index && (
-                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 px-1.5 py-0.5 bg-black text-white text-xs rounded whitespace-nowrap z-30">
-                                  {sizeItem.display_value}
-                                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-2 border-transparent border-t-black"></div>
-                                </div>
-                              )}
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Color attribute */}
-                {item.attributes?.some((attr) => attr.name === "Color") && (
-                  <div data-testid="cart-itemattribute-color" className="mt-2">
-                    <p className="text-xs font-medium mb-1">COLOR:</p>
-                    <div className="flex gap-1">
-                      {item.attributes
-                        .find((attr) => attr.name === "Color")
-                        ?.items.map((colorItem) => (
-                          <button
-                            key={colorItem.value}
-                            data-testid={
-                              item.selectedColor === colorItem.value
-                                ? `cart-itemattribute-color-${colorItem.value
-                                    .toLowerCase()
-                                    .replace(/\s+/g, "-")}-selected`
-                                : `cart-itemattribute-color-${colorItem.value
-                                    .toLowerCase()
-                                    .replace(/\s+/g, "-")}`
-                            }
-                            className={`w-5 h-5 rounded-sm ${
-                              item.selectedColor === colorItem.value
-                                ? "ring-1 ring-black ring-offset-1"
-                                : ""
-                            }`}
-                            style={{ backgroundColor: colorItem.value }}
-                            onClick={() =>
-                              handleAttributeChange(
-                                item.id,
-                                "Color",
-                                colorItem.value,
-                              )
-                            }
-                            title={colorItem.display_value}
-                          />
-                        ))}
-                    </div>
-                  </div>
-                )}
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-20 h-20 object-cover"
+                />
               </div>
-
-              <img
-                src={item.image}
-                alt={item.name}
-                className="w-20 h-20 object-cover"
-              />
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="mt-4 flex justify-between items-center">

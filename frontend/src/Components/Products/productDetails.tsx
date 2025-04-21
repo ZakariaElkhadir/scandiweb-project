@@ -11,7 +11,7 @@ interface ProductDetailsProps {
     images: string[];
     attributes: {
       id?: string;
-      name: string;
+      name: string; // Could be null in some cases
       items: {
         id?: string;
         value: string;
@@ -34,24 +34,27 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
   const [showAllThumbnails, setShowAllThumbnails] = useState(false);
   const { dispatch } = useCart();
 
-  // Group attributes by type and handle duplicates
-  const groupedAttributes = product.attributes.reduce((groups, attr) => {
-    const name = attr.name.toLowerCase();
-    
-    // If this is a new attribute type, initialize its group
-    if (!groups[name]) {
-      groups[name] = {
-        name: attr.name,
-        type: name,
-        instances: []
-      };
-    }
-    
-    // Add this attribute instance to its group
-    groups[name].instances.push(attr);
-    
-    return groups;
-  }, {} as Record<string, { name: string; type: string; instances: typeof product.attributes }> );
+  // Filter out invalid attributes and group them by type
+  const groupedAttributes = (product.attributes || [])
+    .filter(attr => attr && attr.name) // Filter out null/undefined attributes or names
+    .reduce((groups, attr) => {
+      // Safely get the name and convert to lowercase
+      const name = (attr.name || "unknown").toLowerCase();
+      
+      // If this is a new attribute type, initialize its group
+      if (!groups[name]) {
+        groups[name] = {
+          name: attr.name || "Unknown",
+          type: name,
+          instances: []
+        };
+      }
+      
+      // Add this attribute instance to its group
+      groups[name].instances.push(attr);
+      
+      return groups;
+    }, {} as Record<string, { name: string; type: string; instances: typeof product.attributes }> );
 
   // Initialize selected attributes when product changes
   useEffect(() => {
@@ -59,7 +62,9 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
     
     // For each attribute type, initialize with first value of first instance
     Object.values(groupedAttributes).forEach(group => {
-      if (group.instances.length > 0 && group.instances[0].items.length > 0) {
+      if (group.instances.length > 0 && 
+          group.instances[0].items && 
+          group.instances[0].items.length > 0) {
         // We use the first instance's ID (if available) or type as the key
         const firstInstance = group.instances[0];
         const key = firstInstance.id || group.type;
@@ -72,6 +77,8 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
 
   // Helper functions
   const getSizeAbbreviation = (displayValue: string): string => {
+    if (!displayValue) return ""; // Handle undefined/null
+    
     const lowerValue = displayValue.toLowerCase();
     if (lowerValue === "small") return "S";
     if (lowerValue === "medium") return "M";
@@ -93,8 +100,8 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
 
   // Limit number of thumbnails to show
   const visibleThumbnails = showAllThumbnails
-    ? product.images
-    : product.images.slice(0, 4);
+    ? product.images || []
+    : (product.images || []).slice(0, 4);
 
   // Add to cart handler
   const handleAddToCart = () => {
@@ -107,6 +114,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
     const unselectedTypes = Object.values(groupedAttributes)
       .filter(group => 
         group.instances.length > 0 && 
+        group.instances[0].items && 
         group.instances[0].items.length > 0 && 
         !group.instances.some(attr => selectedAttributes[attr.id || group.type])
       )
@@ -156,8 +164,8 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
         name: product.name,
         price: product.price,
         quantity: 1,
-        image: product.images[selectedImage],
-        currency: product.currency.symbol,
+        image: product.images?.[selectedImage] || '',
+        currency: product.currency?.symbol || '$',
         attributes: product.attributes,
         ...attributeSelections
       },
@@ -169,7 +177,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
       {/* Image Gallery - Mobile version (horizontal scroll) */}
       <div className="md:hidden w-full mb-4 overflow-x-auto">
         <div className="flex gap-2 pb-2">
-          {product.images.map((image, index) => (
+          {(product.images || []).map((image, index) => (
             <div
               key={index}
               className={`flex-shrink-0 w-20 h-20 cursor-pointer border ${
@@ -211,12 +219,12 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
           ))}
 
           {/* Show more button if there are more than 4 images */}
-          {product.images.length > 4 && !showAllThumbnails && (
+          {(product.images?.length || 0) > 4 && !showAllThumbnails && (
             <button
               className="text-xs text-gray-600 hover:text-black underline"
               onClick={() => setShowAllThumbnails(true)}
             >
-              +{product.images.length - 4} more
+              +{(product.images?.length || 0) - 4} more
             </button>
           )}
         </div>
@@ -225,40 +233,42 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
         <div className="flex-1">
           <div className="relative w-full">
             <img
-              src={product.images[selectedImage]}
+              src={product.images?.[selectedImage] || ''}
               alt={product.name}
               className="w-full h-auto object-cover"
             />
-            <div className="absolute inset-0 flex items-center justify-between px-2">
-              <button
-                onClick={() =>
-                  setSelectedImage((prev) =>
-                    prev > 0 ? prev - 1 : product.images.length - 1
-                  )
-                }
-                className="rounded-sm p-2 shadow-md cursor-pointer"
-                style={{
-                  backgroundColor: "rgba(156, 163, 175, 0.7)",
-                }}
-                aria-label="Previous image"
-              >
-                <ArrowLeft size={20} />
-              </button>
-              <button
-                onClick={() =>
-                  setSelectedImage((prev) =>
-                    prev < product.images.length - 1 ? prev + 1 : 0
-                  )
-                }
-                className="rounded-sm p-2 shadow-md cursor-pointer"
-                style={{
-                  backgroundColor: "rgba(156, 163, 175, 0.7)",
-                }}
-                aria-label="Next image"
-              >
-                <ArrowRight size={20} />
-              </button>
-            </div>
+            {product.images && product.images.length > 1 && (
+              <div className="absolute inset-0 flex items-center justify-between px-2">
+                <button
+                  onClick={() =>
+                    setSelectedImage((prev) =>
+                      prev > 0 ? prev - 1 : (product.images?.length || 1) - 1
+                    )
+                  }
+                  className="rounded-sm p-2 shadow-md cursor-pointer"
+                  style={{
+                    backgroundColor: "rgba(156, 163, 175, 0.7)",
+                  }}
+                  aria-label="Previous image"
+                >
+                  <ArrowLeft size={20} />
+                </button>
+                <button
+                  onClick={() =>
+                    setSelectedImage((prev) =>
+                      prev < (product.images?.length || 1) - 1 ? prev + 1 : 0
+                    )
+                  }
+                  className="rounded-sm p-2 shadow-md cursor-pointer"
+                  style={{
+                    backgroundColor: "rgba(156, 163, 175, 0.7)",
+                  }}
+                  aria-label="Next image"
+                >
+                  <ArrowRight size={20} />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -266,7 +276,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
       {/* Main image for mobile */}
       <div className="md:hidden w-full h-64 sm:h-80 mb-4">
         <img
-          src={product.images[selectedImage]}
+          src={product.images?.[selectedImage] || ''}
           alt={product.name}
           className="w-full h-full object-contain"
         />
@@ -279,7 +289,9 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
         {/* Render attribute groups */}
         {Object.values(groupedAttributes).map(group => {
           // Skip empty attribute groups
-          if (group.instances.length === 0 || group.instances[0].items.length === 0) {
+          if (!group.instances.length || 
+              !group.instances[0].items || 
+              !group.instances[0].items.length) {
             return null;
           }
           
@@ -299,7 +311,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
               <div className="flex flex-wrap gap-2">
                 {/* Size attribute (special styling) */}
                 {group.type === 'size' && firstInstance.items.map((item, index) => (
-                  <div key={item.id || item.value} className="relative">
+                  <div key={item.id || item.value || index} className="relative">
                     <button
                       data-testid={`product-attribute-size-${item.value}`}
                       className={`w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center border text-sm font-medium ${
@@ -324,9 +336,9 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
                 ))}
                 
                 {/* Color attribute (special styling) */}
-                {group.type === 'color' && firstInstance.items.map(item => (
+                {group.type === 'color' && firstInstance.items.map((item, index) => (
                   <button
-                    key={item.id || item.value}
+                    key={item.id || item.value || index}
                     data-testid={`product-attribute-color-${item.value}`}
                     className={`w-6 h-6 rounded-sm ${
                       selectedAttributes[attributeId] === item.value
@@ -341,9 +353,9 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
                 ))}
                 
                 {/* Capacity attribute */}
-                {group.type === 'capacity' && firstInstance.items.map(item => (
+                {group.type === 'capacity' && firstInstance.items.map((item, index) => (
                   <button
-                    key={item.id || item.value}
+                    key={item.id || item.value || index}
                     data-testid={`product-attribute-capacity-${item.value}`}
                     className={`px-3 py-1 border ${
                       selectedAttributes[attributeId] === item.value
@@ -358,9 +370,9 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
                 
                 {/* Other attributes (general styling) */}
                 {group.type !== 'size' && group.type !== 'color' && group.type !== 'capacity' && 
-                  firstInstance.items.map(item => (
+                  firstInstance.items.map((item, index) => (
                     <button
-                      key={item.id || item.value}
+                      key={item.id || item.value || index}
                       data-testid={`product-attribute-${group.type}-${item.value}`}
                       className={`px-3 py-1 border ${
                         selectedAttributes[attributeId] === item.value
@@ -382,8 +394,8 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
         <div className="mb-4">
           <p className="text-sm font-medium uppercase mb-2">PRICE:</p>
           <p className="text-lg font-medium">
-            {product.currency.symbol}
-            {product.price.toFixed(2)}
+            {product.currency?.symbol || '$'}
+            {(product.price || 0).toFixed(2)}
           </p>
         </div>
 
@@ -406,7 +418,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
           className="text-xs sm:text-sm prose max-w-none text-gray-500 mt-6 overflow-auto"
           data-testid="product-description"
         >
-          {parse(product.description)}
+          {parse(product.description || '')}
         </div>
       </div>
     </div>
