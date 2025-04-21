@@ -436,7 +436,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
       : "bg-gray-400 text-gray-700 cursor-not-allowed"
   }`}
   data-testid="add-to-cart"
-  disabled={!Boolean(product.in_stock || product.inStock)}
+  disabled={Boolean(!(product.in_stock || product.inStock))}
   onClick={handleAddToCart}
 >
   {Boolean(product.in_stock || product.inStock) ? "ADD TO CART" : "OUT OF STOCK"}
