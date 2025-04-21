@@ -26,7 +26,6 @@ interface CartState {
   items: CartItem[];
 }
 
-// Extended CartAction to include UPDATE_ITEM_ATTRIBUTES
 type CartAction =
   | { type: "ADD_ITEM"; payload: CartItem | CartItem[] }
   | {
@@ -40,7 +39,8 @@ type CartAction =
         attributeName: string;
         value: string;
       };
-    };
+    }
+  | { type: "CLEAR_CART" };
 
 const CartContext = createContext<{
   state: CartState;
@@ -53,26 +53,30 @@ const attributeNameToProperty = (attributeName: string): string => {
   if (attributeName === "Color") return "selectedColor";
   if (attributeName === "Capacity") return "selectedCapacity";
   // For other attributes, convert to camelCase
-  return `selected${attributeName.charAt(0).toUpperCase() + attributeName.slice(1)}`;
+  return `selected${
+    attributeName.charAt(0).toUpperCase() + attributeName.slice(1)
+  }`;
 };
 
 // Generate a unique ID for cart items based on all selected attributes
 const generateCartItemId = (item: CartItem): string => {
   // Start with the product ID
   let idParts = [item.id];
-  
+
   // Find all selected attribute properties
-  const attributeProps = Object.keys(item).filter(key => key.startsWith('selected') && item[key]);
-  
+  const attributeProps = Object.keys(item).filter(
+    (key) => key.startsWith("selected") && item[key]
+  );
+
   // Sort to ensure consistent ID generation
   attributeProps.sort();
-  
+
   // Add each selected attribute to the ID
-  attributeProps.forEach(prop => {
+  attributeProps.forEach((prop) => {
     idParts.push(`${prop}:${item[prop]}`);
   });
-  
-  return idParts.join('_');
+
+  return idParts.join("_");
 };
 
 /**
@@ -111,7 +115,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
       return { items: [...state.items, newItem] };
 
     case "UPDATE_ITEM":
-      // Use cartItemId for the update if available, otherwise fallback to id
+      //  cartItemId for the update if available, otherwise fallback to id
       const updatedItems = state.items
         .map((item) => {
           // Check by cartItemId (which includes attribute info) instead of just product id
@@ -143,7 +147,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 
       // Create a copy of the item with updated attribute
       const updatedItem = { ...itemToUpdate };
-      
+
       // Convert attribute name to property name and update
       const propertyName = attributeNameToProperty(attributeName);
       updatedItem[propertyName] = value;
@@ -186,6 +190,8 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
           }),
         };
       }
+    case "CLEAR_CART":
+      return { items: [] };
 
     default:
       return state;
