@@ -182,6 +182,20 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
     window.dispatchEvent(new CustomEvent("openCartOverlay"));
   };
   const sanitizedDescription = DOMPurify.sanitize(product.description || "");
+  const areAllAttributesSelected = () => {
+    const unselectedTypes = Object.values(groupedAttributes)
+      .filter(
+        (group) =>
+          group.instances.length > 0 &&
+          group.instances[0].items &&
+          group.instances[0].items.length > 0 &&
+          !group.instances.some(
+            (attr) => selectedAttributes[attr.id || group.type]
+          )
+      );
+    
+    return unselectedTypes.length === 0;
+  };
   return (
     <div className="flex flex-col md:flex-row gap-4 lg:gap-8 max-w-6xl mx-auto p-4 pt-20">
       {/* Image Gallery - Mobile version (horizontal scroll) */}
@@ -431,12 +445,16 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
         {/* Add to cart button */}
         <button
           className={`w-full py-3 px-4 transition text-sm sm:text-base ${
-            Boolean(product.in_stock || product.inStock)
+            Boolean(product.in_stock || product.inStock) &&
+            areAllAttributesSelected()
               ? "bg-green-500 text-white hover:bg-green-600"
               : "bg-gray-400 text-gray-700 cursor-not-allowed"
           }`}
           data-testid="add-to-cart"
-          disabled={!Boolean(product.in_stock || product.inStock)}
+          disabled={
+            !Boolean(product.in_stock || product.inStock) ||
+            !areAllAttributesSelected()
+          }
           onClick={handleAddToCart}
         >
           ADD TO CART
