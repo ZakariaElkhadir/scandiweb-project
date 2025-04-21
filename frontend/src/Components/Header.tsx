@@ -57,11 +57,12 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
 
-        {/* Collection buttons - desktop */}
+        {/* Collection links - desktop */}
         <div className="collections hidden md:flex space-x-4 gap-4">
           {categories.map((category) => (
-            <button
+            <Link
               key={category}
+              to={`/${category.toLowerCase()}`}
               className={`text-gray-700 hover:text-gray-900 uppercase cursor-pointer relative ${
                 activeCategory === category ? "font-medium" : ""
               }`}
@@ -70,13 +71,16 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
                   ? "active-category-link"
                   : "category-link"
               }
-              onClick={() => setActiveCategory(category)}
+              onClick={(e) => {
+                e.preventDefault(); // Prevent navigation
+                setActiveCategory(category);
+              }}
             >
               {category}
               {activeCategory === category && (
                 <div className="absolute bottom-0 left-0 right-0 h-1 bg-green-500 -mb-2"></div>
               )}
-            </button>
+            </Link>
           ))}
         </div>
 
@@ -113,12 +117,14 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
         <div className="mobile-menu-container fixed inset-0 bg-white z-30 pt-16 px-4">
           <div className="flex flex-col space-y-6 mt-8">
             {categories.map((category) => (
-              <button
+              <Link
                 key={category}
+                to={`/${category.toLowerCase()}`}
                 className={`text-gray-700 text-xl hover:text-gray-900 uppercase cursor-pointer relative ${
                   activeCategory === category ? "font-medium" : ""
                 }`}
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault(); // Prevent navigation
                   setActiveCategory(category);
                   setIsMobileMenuOpen(false);
                 }}
@@ -127,7 +133,7 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
                 {activeCategory === category && (
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-green-500 -mb-2"></div>
                 )}
-              </button>
+              </Link>
             ))}
           </div>
         </div>
