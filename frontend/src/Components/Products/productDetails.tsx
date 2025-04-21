@@ -78,7 +78,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
       }
     });
 
-    setSelectedAttributes(initialAttributes);
+    setSelectedAttributes({});
   }, [product.id]);
 
   // Helper functions
