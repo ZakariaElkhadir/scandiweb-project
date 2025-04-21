@@ -431,15 +431,15 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
         {/* Add to cart button */}
         <button
           className={`w-full py-3 px-4 transition text-sm sm:text-base ${
-            product.in_stock
+            Boolean(product.in_stock)
               ? "bg-green-500 text-white hover:bg-green-600"
               : "bg-gray-400 text-gray-700 cursor-not-allowed"
           }`}
           data-testid="add-to-cart"
-          disabled={!product.in_stock}
+          disabled={!Boolean(product.in_stock)}
           onClick={handleAddToCart}
         >
-          {product.in_stock ? "ADD TO CART" : "OUT OF STOCK"}
+          {Boolean(product.in_stock) ? "ADD TO CART" : "OUT OF STOCK"}
         </button>
         {/* Product description */}
         <div
