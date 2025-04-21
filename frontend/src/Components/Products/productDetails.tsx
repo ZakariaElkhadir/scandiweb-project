@@ -25,7 +25,7 @@ interface ProductDetailsProps {
     price: number;
     description: string;
     in_stock: number | boolean;
-    // inStock: number | boolean;
+     inStock: number | boolean;
   };
 }
 
@@ -430,17 +430,17 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
 
         {/* Add to cart button */}
         <button
-          className={`w-full py-3 px-4 transition text-sm sm:text-base ${
-            Boolean(product.in_stock)
-              ? "bg-green-500 text-white hover:bg-green-600"
-              : "bg-gray-400 text-gray-700 cursor-not-allowed"
-          }`}
-          data-testid="add-to-cart"
-          disabled={!Boolean(product.in_stock)}
-          onClick={handleAddToCart}
-        >
-          {Boolean(product.in_stock) ? "ADD TO CART" : "OUT OF STOCK"}
-        </button>
+  className={`w-full py-3 px-4 transition text-sm sm:text-base ${
+    Boolean(product.in_stock || product.inStock)
+      ? "bg-green-500 text-white hover:bg-green-600"
+      : "bg-gray-400 text-gray-700 cursor-not-allowed"
+  }`}
+  data-testid="add-to-cart"
+  disabled={!Boolean(product.in_stock || product.inStock)}
+  onClick={handleAddToCart}
+>
+  {Boolean(product.in_stock || product.inStock) ? "ADD TO CART" : "OUT OF STOCK"}
+</button>
         {/* Product description */}
         <div
           className="text-xs sm:text-sm prose prose-sm max-w-none text-gray-500 mt-6 overflow-auto"
