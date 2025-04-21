@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "../Cart/CartContext";
 import { toast } from "react-toastify";
 import { ArrowRight, ArrowLeft } from "lucide-react";
@@ -10,8 +10,10 @@ interface ProductDetailsProps {
     name: string;
     images: string[];
     attributes: {
+      id?: string;
       name: string;
       items: {
+        id?: string;
         value: string;
         display_value: string;
       }[];
@@ -27,19 +29,48 @@ interface ProductDetailsProps {
 
 const ProductDetails = ({ product }: ProductDetailsProps) => {
   const [selectedImage, setSelectedImage] = useState(0);
-  const [selectedSize, setSelectedSize] = useState("");
-  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
   const [hoveredSizeIndex, setHoveredSizeIndex] = useState<number | null>(null);
   const [showAllThumbnails, setShowAllThumbnails] = useState(false);
-  const { dispatch} = useCart();
+  const { dispatch } = useCart();
 
-  // Find size and color attributes
-  const sizeAttribute = product.attributes.find((attr) => attr.name === "Size");
-  const colorAttribute = product.attributes.find(
-    (attr) => attr.name === "Color"
-  );
+  // Group attributes by type and handle duplicates
+  const groupedAttributes = product.attributes.reduce((groups, attr) => {
+    const name = attr.name.toLowerCase();
+    
+    // If this is a new attribute type, initialize its group
+    if (!groups[name]) {
+      groups[name] = {
+        name: attr.name,
+        type: name,
+        instances: []
+      };
+    }
+    
+    // Add this attribute instance to its group
+    groups[name].instances.push(attr);
+    
+    return groups;
+  }, {} as Record<string, { name: string; type: string; instances: typeof product.attributes }> );
 
-  // Abbreviated size label
+  // Initialize selected attributes when product changes
+  useEffect(() => {
+    const initialAttributes: Record<string, string> = {};
+    
+    // For each attribute type, initialize with first value of first instance
+    Object.values(groupedAttributes).forEach(group => {
+      if (group.instances.length > 0 && group.instances[0].items.length > 0) {
+        // We use the first instance's ID (if available) or type as the key
+        const firstInstance = group.instances[0];
+        const key = firstInstance.id || group.type;
+        initialAttributes[key] = firstInstance.items[0].value;
+      }
+    });
+    
+    setSelectedAttributes(initialAttributes);
+  }, [product.id]);
+
+  // Helper functions
   const getSizeAbbreviation = (displayValue: string): string => {
     const lowerValue = displayValue.toLowerCase();
     if (lowerValue === "small") return "S";
@@ -49,8 +80,15 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
     if (lowerValue === "extra small") return "XS";
     if (lowerValue === "2x large" || lowerValue === "xx large") return "2XL";
     if (lowerValue === "3x large" || lowerValue === "xxx large") return "3XL";
-    // If no match, returning the original value
     return displayValue;
+  };
+
+  // Handle attribute selection
+  const handleAttributeSelect = (attributeId: string, value: string) => {
+    setSelectedAttributes(prev => ({
+      ...prev,
+      [attributeId]: value
+    }));
   };
 
   // Limit number of thumbnails to show
@@ -59,29 +97,58 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
     : product.images.slice(0, 4);
 
   // Add to cart handler
-
   const handleAddToCart = () => {
     if ((product.in_stock ?? 0) <= 0) {
       toast.error(`${product.name} is out of stock`);
       return;
     }
 
-    // Check if size is selected when needed
-    if (sizeAttribute && !selectedSize) {
-      toast.error(`Please select a size for ${product.name}`);
+    // Check if at least one attribute of each type has been selected
+    const unselectedTypes = Object.values(groupedAttributes)
+      .filter(group => 
+        group.instances.length > 0 && 
+        group.instances[0].items.length > 0 && 
+        !group.instances.some(attr => selectedAttributes[attr.id || group.type])
+      )
+      .map(group => group.name);
+
+    if (unselectedTypes.length > 0) {
+      toast.error(`Please select ${unselectedTypes.join(", ")} for ${product.name}`);
       return;
     }
 
-    // Check if color is selected when needed
-    if (colorAttribute && !selectedColor) {
-      toast.error(`Please select a color for ${product.name}`);
-      return;
-    }
+    // Prepare selections for cart
+    const attributeSelections: Record<string, string> = {};
+    
+    // Convert selections to the format expected by the cart
+    Object.entries(selectedAttributes).forEach(([key, value]) => {
+      // Find the attribute this selection belongs to
+      const attributeType = Object.values(groupedAttributes).find(group => 
+        group.instances.some(attr => (attr.id || group.type) === key)
+      );
+      
+      if (attributeType) {
+        const type = attributeType.type;
+        
+        // Handle special attribute types
+        if (type === 'size') {
+          attributeSelections.selectedSize = value;
+        } else if (type === 'color') {
+          attributeSelections.selectedColor = value;
+        } else if (type === 'capacity') {
+          attributeSelections.selectedCapacity = value;
+        } else {
+          // Convert other attribute names to camelCase
+          const camelCaseName = `selected${attributeType.name.charAt(0).toUpperCase() + attributeType.name.slice(1)}`;
+          attributeSelections[camelCaseName] = value;
+        }
+      }
+    });
 
     // Show success toast
     toast.success(`${product.name} added to cart successfully!`);
 
-    // Dispatch to cart
+    // Dispatch to cart with all selected attributes
     dispatch({
       type: "ADD_ITEM",
       payload: {
@@ -89,11 +156,10 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
         name: product.name,
         price: product.price,
         quantity: 1,
-        image: product.images[selectedImage], // Use the selected image
+        image: product.images[selectedImage],
         currency: product.currency.symbol,
-        attributes: product.attributes, // Include all attributes for later modification
-        selectedSize: selectedSize,
-        selectedColor: selectedColor,
+        attributes: product.attributes,
+        ...attributeSelections
       },
     });
   };
@@ -156,7 +222,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
         </div>
 
         {/* Main image */}
-        <div className="flex-1  ">
+        <div className="flex-1">
           <div className="relative w-full">
             <img
               src={product.images[selectedImage]}
@@ -210,72 +276,107 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
       <div className="md:w-1/2 lg:w-2/5 space-y-4">
         <h1 className="text-xl sm:text-2xl font-medium">{product.name}</h1>
 
-        {/* Size selection */}
-        {sizeAttribute && (
-          <div
-            className="mb-4"
-            data-testid={`product-attribute-${sizeAttribute.name
-              .toLowerCase()
-              .replace(/\s+/g, "-")}`}
-          >
-            <p className="text-sm font-medium uppercase mb-2">SIZE:</p>
-            <div className="flex flex-wrap gap-2">
-              {sizeAttribute.items.map((item, index) => (
-                <div key={item.value} className="relative">
+        {/* Render attribute groups */}
+        {Object.values(groupedAttributes).map(group => {
+          // Skip empty attribute groups
+          if (group.instances.length === 0 || group.instances[0].items.length === 0) {
+            return null;
+          }
+          
+          // Just render first instance of each attribute type
+          // since we want to deduplicate
+          const firstInstance = group.instances[0];
+          const attributeId = firstInstance.id || group.type;
+          
+          return (
+            <div
+              key={group.type}
+              className="mb-4"
+              data-testid={`product-attribute-${group.type}`}
+            >
+              <p className="text-sm font-medium uppercase mb-2">{group.name}:</p>
+              
+              <div className="flex flex-wrap gap-2">
+                {/* Size attribute (special styling) */}
+                {group.type === 'size' && firstInstance.items.map((item, index) => (
+                  <div key={item.id || item.value} className="relative">
+                    <button
+                      data-testid={`product-attribute-size-${item.value}`}
+                      className={`w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center border text-sm font-medium ${
+                        selectedAttributes[attributeId] === item.value
+                          ? "border-black bg-black text-white"
+                          : "border-gray-300 hover:border-gray-500"
+                      }`}
+                      onClick={() => handleAttributeSelect(attributeId, item.value)}
+                      onMouseEnter={() => setHoveredSizeIndex(index)}
+                      onMouseLeave={() => setHoveredSizeIndex(null)}
+                    >
+                      {getSizeAbbreviation(item.display_value)}
+                    </button>
+                    
+                    {hoveredSizeIndex === index && (
+                      <div className="hidden sm:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded whitespace-nowrap">
+                        {item.display_value}
+                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black"></div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                
+                {/* Color attribute (special styling) */}
+                {group.type === 'color' && firstInstance.items.map(item => (
                   <button
-                    className={`w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center border text-sm font-medium ${
-                      selectedSize === item.value
+                    key={item.id || item.value}
+                    data-testid={`product-attribute-color-${item.value}`}
+                    className={`w-6 h-6 rounded-sm ${
+                      selectedAttributes[attributeId] === item.value
+                        ? "ring-2 ring-black ring-offset-1"
+                        : ""
+                    }`}
+                    style={{ backgroundColor: item.value }}
+                    onClick={() => handleAttributeSelect(attributeId, item.value)}
+                    title={item.display_value}
+                    aria-label={`Color: ${item.display_value}`}
+                  />
+                ))}
+                
+                {/* Capacity attribute */}
+                {group.type === 'capacity' && firstInstance.items.map(item => (
+                  <button
+                    key={item.id || item.value}
+                    data-testid={`product-attribute-capacity-${item.value}`}
+                    className={`px-3 py-1 border ${
+                      selectedAttributes[attributeId] === item.value
                         ? "border-black bg-black text-white"
                         : "border-gray-300 hover:border-gray-500"
                     }`}
-                    onClick={() => setSelectedSize(item.value)}
-                    onMouseEnter={() => setHoveredSizeIndex(index)}
-                    onMouseLeave={() => setHoveredSizeIndex(null)}
+                    onClick={() => handleAttributeSelect(attributeId, item.value)}
                   >
-                    {getSizeAbbreviation(item.display_value)}
+                    {item.display_value}
                   </button>
-
-                  {/* Popup tooltip - only show on larger screens */}
-                  {hoveredSizeIndex === index && (
-                    <div className="hidden sm:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded whitespace-nowrap">
+                ))}
+                
+                {/* Other attributes (general styling) */}
+                {group.type !== 'size' && group.type !== 'color' && group.type !== 'capacity' && 
+                  firstInstance.items.map(item => (
+                    <button
+                      key={item.id || item.value}
+                      data-testid={`product-attribute-${group.type}-${item.value}`}
+                      className={`px-3 py-1 border ${
+                        selectedAttributes[attributeId] === item.value
+                          ? "border-black bg-black text-white"
+                          : "border-gray-300 hover:border-gray-500"
+                      }`}
+                      onClick={() => handleAttributeSelect(attributeId, item.value)}
+                    >
                       {item.display_value}
-                      {/* Arrow pointing down */}
-                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black"></div>
-                    </div>
-                  )}
-                </div>
-              ))}
+                    </button>
+                  ))
+                }
+              </div>
             </div>
-          </div>
-        )}
-
-        {/* Color selection */}
-        {colorAttribute && (
-          <div
-            className="mb-4"
-            data-testid={`product-attribute-${colorAttribute.name
-              .toLowerCase()
-              .replace(/\s+/g, "-")}`}
-          >
-            <p className="text-sm font-medium uppercase mb-2">COLOR:</p>
-            <div className="flex flex-wrap gap-2">
-              {colorAttribute.items.map((item) => (
-                <button
-                  key={item.value}
-                  className={`w-6 h-6 rounded-sm ${
-                    selectedColor === item.value
-                      ? "ring-2 ring-black ring-offset-1"
-                      : ""
-                  }`}
-                  style={{ backgroundColor: item.value }}
-                  onClick={() => setSelectedColor(item.value)}
-                  title={item.display_value}
-                  aria-label={`Color: ${item.display_value}`}
-                />
-              ))}
-            </div>
-          </div>
-        )}
+          );
+        })}
 
         {/* Price */}
         <div className="mb-4">

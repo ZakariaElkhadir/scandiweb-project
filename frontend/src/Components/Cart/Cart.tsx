@@ -121,7 +121,8 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
       />
 
       {/* Cart content */}
-      <div className="fixed top-16 right-0 w-96 bg-white max-h-[calc(100vh-4rem)] p-4 shadow-lg z-20 flex flex-col">
+      <div className="fixed top-16 right-0 w-96 bg-white max-h-[calc(100vh-4rem)] p-4 shadow-lg z-20 flex flex-col"
+      data-testid="cart-overlay">
         <h2 className="text-lg font-semibold mb-4">
           My Bag, {state.items.length}{" "}
           {state.items.length === 1 ? "Item" : "Items"}
