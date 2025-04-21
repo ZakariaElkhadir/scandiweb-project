@@ -110,10 +110,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
 
   // Add to cart handler
   const handleAddToCart = () => {
-    if ((product.in_stock ?? 0) <= 0) {
-      toast.error(`${product.name} is out of stock`);
-      return;
-    }
+   
 
     // Check if at least one attribute of each type has been selected
     const unselectedTypes = Object.values(groupedAttributes)
@@ -441,7 +438,12 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
               : "bg-gray-400 text-gray-700 cursor-not-allowed"
           }`}
           data-testid="add-to-cart"
-          disabled={true} // Temporarily force disabled to pass the test
+          disabled={
+            !(
+              product.in_stock === true ||
+              (typeof product.in_stock === "number" && product.in_stock > 0)
+            )
+          }
           onClick={handleAddToCart}
         >
           {product.in_stock === true ||
