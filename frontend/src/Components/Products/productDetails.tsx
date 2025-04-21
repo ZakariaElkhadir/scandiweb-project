@@ -110,8 +110,6 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
 
   // Add to cart handler
   const handleAddToCart = () => {
-   
-
     // Check if at least one attribute of each type has been selected
     const unselectedTypes = Object.values(groupedAttributes)
       .filter(
