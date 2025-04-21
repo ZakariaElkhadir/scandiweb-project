@@ -25,6 +25,7 @@ interface ProductDetailsProps {
     price: number;
     description: string;
     in_stock: number | boolean;
+    inStock: number | boolean;
   };
 }
 
@@ -438,8 +439,8 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
           data-testid="add-to-cart"
           disabled={
             !(
-              product.in_stock === true ||
-              (typeof product.in_stock === "number" && product.in_stock > 0)
+              product.inStock === true ||
+              (typeof product.inStock === "number" && product.inStock > 0)
             )
           }
           onClick={handleAddToCart}
