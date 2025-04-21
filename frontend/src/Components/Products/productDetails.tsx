@@ -171,6 +171,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
         ...attributeSelections
       },
     });
+    window.dispatchEvent(new CustomEvent('openCartOverlay'));
   };
   const sanitizedDescription = DOMPurify.sanitize(product.description || '');
   return (
