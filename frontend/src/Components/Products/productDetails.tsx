@@ -226,45 +226,94 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
 
       {/* Left side - Images for tablet/desktop */}
       <div
-        className="hidden md:flex md:w-1/2 lg:w-3/5"
+        className="hidden md:block md:w-1/2 lg:w-3/5"
         data-testid="product-gallery"
       >
-        {/* Thumbnails column */}
-        <div className="hidden md:flex flex-col gap-2 mr-4 w-20">
-          {visibleThumbnails.map((image, index) => (
-            <div
-              key={index}
-              className={`w-16 h-16 cursor-pointer border ${
-                selectedImage === index ? "border-black" : "border-gray-200"
-              }`}
-              onClick={() => setSelectedImage(index)}
-            >
-              <img
-                src={image}
-                alt={`${product.name} thumbnail ${index}`}
-                className="w-full h-full object-cover"
-              />
+        <div className="flex h-full">
+          {/* Thumbnails column */}
+          <div className="hidden md:flex flex-col gap-2 mr-4">
+            {visibleThumbnails.map((image, index) => (
+              <div
+                key={index}
+                className={`w-16 h-16 cursor-pointer border ${
+                  selectedImage === index ? "border-black" : "border-gray-200"
+                }`}
+                onClick={() => setSelectedImage(index)}
+              >
+                <img
+                  src={image}
+                  alt={`${product.name} thumbnail ${index}`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ))}
+
+            {/* Show more button if there are more than 4 images */}
+            {(product.images?.length || 0) > 4 && !showAllThumbnails && (
+              <button
+                className="text-xs text-gray-600 hover:text-black underline"
+                onClick={() => setShowAllThumbnails(true)}
+              >
+                +{(product.images?.length || 0) - 4} more
+              </button>
+            )}
+          </div>
+
+          {/* Main image with fixed aspect ratio container */}
+          <div className="flex-1">
+            <div className="relative w-full h-0 pb-[100%]">
+              <div className="absolute inset-0 flex items-center justify-center bg-white">
+                <img
+                  src={product.images?.[selectedImage] || ""}
+                  alt={product.name}
+                  className="max-w-full max-h-full object-contain"
+                />
+                {product.images && product.images.length > 1 && (
+                  <div className="absolute inset-0 flex items-center justify-between px-2">
+                    <button
+                      onClick={() =>
+                        setSelectedImage((prev) =>
+                          prev > 0 ? prev - 1 : (product.images?.length || 1) - 1,
+                        )
+                      }
+                      className="rounded-sm p-2 shadow-md cursor-pointer z-10"
+                      style={{
+                        backgroundColor: "rgba(156, 163, 175, 0.7)",
+                      }}
+                      aria-label="Previous image"
+                    >
+                      <ArrowLeft size={20} />
+                    </button>
+                    <button
+                      onClick={() =>
+                        setSelectedImage((prev) =>
+                          prev < (product.images?.length || 1) - 1 ? prev + 1 : 0,
+                        )
+                      }
+                      className="rounded-sm p-2 shadow-md cursor-pointer z-10"
+                      style={{
+                        backgroundColor: "rgba(156, 163, 175, 0.7)",
+                      }}
+                      aria-label="Next image"
+                    >
+                      <ArrowRight size={20} />
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
-          ))}
-
-          {/* Show more button if there are more than 4 images */}
-          {(product.images?.length || 0) > 4 && !showAllThumbnails && (
-            <button
-              className="text-xs text-gray-600 hover:text-black underline"
-              onClick={() => setShowAllThumbnails(true)}
-            >
-              +{(product.images?.length || 0) - 4} more
-            </button>
-          )}
+          </div>
         </div>
+      </div>
 
-        {/* Main image */}
-        <div className="flex-1">
-          <div className="relative w-full">
+      {/* Main image for mobile with fixed aspect ratio */}
+      <div className="md:hidden w-full mb-4">
+        <div className="relative w-full h-0 pb-[100%] bg-gray-50">
+          <div className="absolute inset-0 flex items-center justify-center">
             <img
               src={product.images?.[selectedImage] || ""}
               alt={product.name}
-              className="w-full h-auto object-cover"
+              className="max-w-full max-h-full object-contain"
             />
             {product.images && product.images.length > 1 && (
               <div className="absolute inset-0 flex items-center justify-between px-2">
@@ -274,7 +323,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
                       prev > 0 ? prev - 1 : (product.images?.length || 1) - 1,
                     )
                   }
-                  className="rounded-sm p-2 shadow-md cursor-pointer"
+                  className="rounded-sm p-2 shadow-md cursor-pointer z-10"
                   style={{
                     backgroundColor: "rgba(156, 163, 175, 0.7)",
                   }}
@@ -288,7 +337,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
                       prev < (product.images?.length || 1) - 1 ? prev + 1 : 0,
                     )
                   }
-                  className="rounded-sm p-2 shadow-md cursor-pointer"
+                  className="rounded-sm p-2 shadow-md cursor-pointer z-10"
                   style={{
                     backgroundColor: "rgba(156, 163, 175, 0.7)",
                   }}
@@ -300,15 +349,6 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
             )}
           </div>
         </div>
-      </div>
-
-      {/* Main image for mobile */}
-      <div className="md:hidden w-full h-64 sm:h-80 mb-4">
-        <img
-          src={product.images?.[selectedImage] || ""}
-          alt={product.name}
-          className="w-full h-full object-contain"
-        />
       </div>
 
       {/* Right side - Product details */}
