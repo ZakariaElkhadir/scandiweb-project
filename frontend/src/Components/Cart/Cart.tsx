@@ -22,11 +22,13 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
     itemId: string;
     index: number;
   } | null>(null);
-  
+
   // New state for checkout
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [customerEmail, setCustomerEmail] = useState("zakaria@gmail.com");
-  const [shippingAddress, setShippingAddress] = useState("123 Morocco Casablanca");
+  const [shippingAddress, setShippingAddress] = useState(
+    "123 Morocco Casablanca",
+  );
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
 
   const totalPrice = state.items.reduce(
@@ -68,7 +70,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
     if (attributeName === "Size") return item.selectedSize;
     if (attributeName === "Color") return item.selectedColor;
     if (attributeName === "Capacity") return item.selectedCapacity;
-    
+
     // Handle other attributes by checking the camelCased properties
     const camelCaseKey = `selected${attributeName.charAt(0).toUpperCase() + attributeName.slice(1)}`;
     return item[camelCaseKey];
@@ -163,7 +165,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
       />
 
       {/* Cart content */}
-      <div 
+      <div
         className="fixed top-16 right-0 w-96 bg-white max-h-[calc(100vh-4rem)] p-4 shadow-lg z-20 flex flex-col"
         data-testid="cart-overlay"
       >
@@ -171,7 +173,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
           My Bag, {state.items.length}{" "}
           {state.items.length === 1 ? "Item" : "Items"}
         </h2>
-        
+
         {/* Show checkout form if needed */}
         {showCheckoutForm ? (
           <div className="mb-4 border-b pb-4">
@@ -187,7 +189,9 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
               />
             </div>
             <div className="mb-2">
-              <label className="block text-xs text-gray-600 mb-1">Shipping Address</label>
+              <label className="block text-xs text-gray-600 mb-1">
+                Shipping Address
+              </label>
               <textarea
                 value={shippingAddress}
                 onChange={(e) => setShippingAddress(e.target.value)}
@@ -201,16 +205,20 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
           <div className="max-h-[calc(100vh-240px)] overflow-y-auto">
             {state.items.map((item) => {
               // Process attributes to avoid duplicates
-              const uniqueAttributes = item.attributes ? 
-                item.attributes.reduce((uniqueAttrs: Record<string, any>, attr) => {
-                  if (!attr || !attr.name) return uniqueAttrs;
-                  const lowerName = attr.name.toLowerCase();
-                  // Only add if not already present
-                  if (!uniqueAttrs[lowerName]) {
-                    uniqueAttrs[lowerName] = attr;
-                  }
-                  return uniqueAttrs;
-                }, {}) : {};
+              const uniqueAttributes = item.attributes
+                ? item.attributes.reduce(
+                    (uniqueAttrs: Record<string, any>, attr) => {
+                      if (!attr || !attr.name) return uniqueAttrs;
+                      const lowerName = attr.name.toLowerCase();
+                      // Only add if not already present
+                      if (!uniqueAttrs[lowerName]) {
+                        uniqueAttrs[lowerName] = attr;
+                      }
+                      return uniqueAttrs;
+                    },
+                    {},
+                  )
+                : {};
 
               return (
                 <div
@@ -267,35 +275,125 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                     {/* Render unique attributes */}
                     {Object.values(uniqueAttributes).map((attr: any) => {
                       if (!attr || !attr.name || !attr.items) return null;
-                      
+
                       const attrName = attr.name;
                       const attrNameLower = attrName.toLowerCase();
-                      const selectedValue = getSelectedAttributeValue(item, attrName);
-                      
+                      const selectedValue = getSelectedAttributeValue(
+                        item,
+                        attrName,
+                      );
+
                       return (
-                        <div 
+                        <div
                           key={attrName}
-                          data-testid={`cart-itemattribute-${attrNameLower}`} 
+                          data-testid={`cart-itemattribute-${attrNameLower}`}
                           className="mt-2"
                         >
-                          <p className="text-xs font-medium mb-1">{attrName.toUpperCase()}:</p>
-                          
+                          <p className="text-xs font-medium mb-1">
+                            {attrName.toUpperCase()}:
+                          </p>
+
                           <div className="flex gap-1">
                             {/* For Size attributes */}
-                            {attrNameLower === "size" && attr.items.map((sizeItem: any, index: number) => (
-                              <div key={sizeItem.value} className="relative">
+                            {attrNameLower === "size" &&
+                              attr.items.map((sizeItem: any, index: number) => (
+                                <div key={sizeItem.value} className="relative">
+                                  <button
+                                    data-testid={
+                                      selectedValue === sizeItem.value
+                                        ? `cart-itemattribute-size-${sizeItem.value
+                                            .toLowerCase()
+                                            .replace(/\s+/g, "-")}-selected`
+                                        : `cart-itemattribute-size-${sizeItem.value
+                                            .toLowerCase()
+                                            .replace(/\s+/g, "-")}`
+                                    }
+                                    className={`w-6 h-6 flex items-center justify-center border text-xs ${
+                                      selectedValue === sizeItem.value
+                                        ? "border-black bg-black text-white"
+                                        : "border-gray-300"
+                                    }`}
+                                    onClick={() =>
+                                      handleAttributeChange(
+                                        item.id,
+                                        attrName,
+                                        sizeItem.value,
+                                      )
+                                    }
+                                    onMouseEnter={() =>
+                                      setHoveredSizeIndex({
+                                        itemId: item.id,
+                                        index,
+                                      })
+                                    }
+                                    onMouseLeave={() =>
+                                      setHoveredSizeIndex(null)
+                                    }
+                                  >
+                                    {getSizeAbbreviation(
+                                      sizeItem.display_value,
+                                    )}
+                                  </button>
+
+                                  {/* Tooltip */}
+                                  {hoveredSizeIndex?.itemId === item.id &&
+                                    hoveredSizeIndex?.index === index && (
+                                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 px-1.5 py-0.5 bg-black text-white text-xs rounded whitespace-nowrap z-30">
+                                        {sizeItem.display_value}
+                                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-2 border-transparent border-t-black"></div>
+                                      </div>
+                                    )}
+                                </div>
+                              ))}
+
+                            {/* For Color attributes */}
+                            {attrNameLower === "color" &&
+                              attr.items.map((colorItem: any) => (
                                 <button
+                                  key={colorItem.value}
                                   data-testid={
-                                    selectedValue === sizeItem.value
-                                      ? `cart-itemattribute-size-${sizeItem.value
+                                    selectedValue === colorItem.value
+                                      ? `cart-itemattribute-color-${colorItem.value
                                           .toLowerCase()
                                           .replace(/\s+/g, "-")}-selected`
-                                      : `cart-itemattribute-size-${sizeItem.value
+                                      : `cart-itemattribute-color-${colorItem.value
                                           .toLowerCase()
                                           .replace(/\s+/g, "-")}`
                                   }
-                                  className={`w-6 h-6 flex items-center justify-center border text-xs ${
-                                    selectedValue === sizeItem.value
+                                  className={`w-5 h-5 rounded-sm ${
+                                    selectedValue === colorItem.value
+                                      ? "ring-1 ring-black ring-offset-1"
+                                      : ""
+                                  }`}
+                                  style={{ backgroundColor: colorItem.value }}
+                                  onClick={() =>
+                                    handleAttributeChange(
+                                      item.id,
+                                      attrName,
+                                      colorItem.value,
+                                    )
+                                  }
+                                  title={colorItem.display_value}
+                                />
+                              ))}
+
+                            {/* For other attributes (like Capacity) */}
+                            {attrNameLower !== "size" &&
+                              attrNameLower !== "color" &&
+                              attr.items.map((attrItem: any) => (
+                                <button
+                                  key={attrItem.value}
+                                  data-testid={
+                                    selectedValue === attrItem.value
+                                      ? `cart-itemattribute-${attrNameLower}-${attrItem.value
+                                          .toLowerCase()
+                                          .replace(/\s+/g, "-")}-selected`
+                                      : `cart-itemattribute-${attrNameLower}-${attrItem.value
+                                          .toLowerCase()
+                                          .replace(/\s+/g, "-")}`
+                                  }
+                                  className={`px-2 py-1 border text-xs ${
+                                    selectedValue === attrItem.value
                                       ? "border-black bg-black text-white"
                                       : "border-gray-300"
                                   }`}
@@ -303,87 +401,13 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                                     handleAttributeChange(
                                       item.id,
                                       attrName,
-                                      sizeItem.value,
+                                      attrItem.value,
                                     )
                                   }
-                                  onMouseEnter={() =>
-                                    setHoveredSizeIndex({ itemId: item.id, index })
-                                  }
-                                  onMouseLeave={() => setHoveredSizeIndex(null)}
                                 >
-                                  {getSizeAbbreviation(sizeItem.display_value)}
+                                  {attrItem.display_value}
                                 </button>
-
-                                {/* Tooltip */}
-                                {hoveredSizeIndex?.itemId === item.id &&
-                                  hoveredSizeIndex?.index === index && (
-                                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 px-1.5 py-0.5 bg-black text-white text-xs rounded whitespace-nowrap z-30">
-                                      {sizeItem.display_value}
-                                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-2 border-transparent border-t-black"></div>
-                                    </div>
-                                  )}
-                              </div>
-                            ))}
-                            
-                            {/* For Color attributes */}
-                            {attrNameLower === "color" && attr.items.map((colorItem: any) => (
-                              <button
-                                key={colorItem.value}
-                                data-testid={
-                                  selectedValue === colorItem.value
-                                    ? `cart-itemattribute-color-${colorItem.value
-                                        .toLowerCase()
-                                        .replace(/\s+/g, "-")}-selected`
-                                    : `cart-itemattribute-color-${colorItem.value
-                                        .toLowerCase()
-                                        .replace(/\s+/g, "-")}`
-                                }
-                                className={`w-5 h-5 rounded-sm ${
-                                  selectedValue === colorItem.value
-                                    ? "ring-1 ring-black ring-offset-1"
-                                    : ""
-                                }`}
-                                style={{ backgroundColor: colorItem.value }}
-                                onClick={() =>
-                                  handleAttributeChange(
-                                    item.id,
-                                    attrName,
-                                    colorItem.value,
-                                  )
-                                }
-                                title={colorItem.display_value}
-                              />
-                            ))}
-                            
-                            {/* For other attributes (like Capacity) */}
-                            {attrNameLower !== "size" && attrNameLower !== "color" && attr.items.map((attrItem: any) => (
-                              <button
-                                key={attrItem.value}
-                                data-testid={
-                                  selectedValue === attrItem.value
-                                    ? `cart-itemattribute-${attrNameLower}-${attrItem.value
-                                        .toLowerCase()
-                                        .replace(/\s+/g, "-")}-selected`
-                                    : `cart-itemattribute-${attrNameLower}-${attrItem.value
-                                        .toLowerCase()
-                                        .replace(/\s+/g, "-")}`
-                                }
-                                className={`px-2 py-1 border text-xs ${
-                                  selectedValue === attrItem.value
-                                    ? "border-black bg-black text-white"
-                                    : "border-gray-300"
-                                }`}
-                                onClick={() =>
-                                  handleAttributeChange(
-                                    item.id,
-                                    attrName,
-                                    attrItem.value,
-                                  )
-                                }
-                              >
-                                {attrItem.display_value}
-                              </button>
-                            ))}
+                              ))}
                           </div>
                         </div>
                       );
@@ -408,7 +432,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
               {state.items[0]?.currency || "$"} {totalPrice.toFixed(2)}
             </p>
           </div>
-          
+
           <div className="flex gap-2">
             {showCheckoutForm && (
               <button
@@ -418,7 +442,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                 Back
               </button>
             )}
-            
+
             <button
               className={`flex-1 py-2 ${
                 state.items.length > 0
@@ -428,13 +452,11 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
               disabled={state.items.length === 0 || isCheckingOut}
               onClick={handleCheckout}
             >
-              {isCheckingOut ? (
-                "Processing..."
-              ) : showCheckoutForm ? (
-                "Place Order"
-              ) : (
-                "Checkout"
-              )}
+              {isCheckingOut
+                ? "Processing..."
+                : showCheckoutForm
+                  ? "Place Order"
+                  : "Checkout"}
             </button>
           </div>
         </div>

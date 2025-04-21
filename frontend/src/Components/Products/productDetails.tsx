@@ -41,24 +41,30 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
   // Filter out invalid attributes and group them by type
   const groupedAttributes = (product.attributes || [])
     .filter((attr) => attr && attr.name) // Filter out null/undefined attributes or names
-    .reduce((groups, attr) => {
-      // Safely get the name and convert to lowercase
-      const name = (attr.name || "unknown").toLowerCase();
+    .reduce(
+      (groups, attr) => {
+        // Safely get the name and convert to lowercase
+        const name = (attr.name || "unknown").toLowerCase();
 
-      // If this is a new attribute type, initialize its group
-      if (!groups[name]) {
-        groups[name] = {
-          name: attr.name || "Unknown",
-          type: name,
-          instances: [],
-        };
-      }
+        // If this is a new attribute type, initialize its group
+        if (!groups[name]) {
+          groups[name] = {
+            name: attr.name || "Unknown",
+            type: name,
+            instances: [],
+          };
+        }
 
-      // Add this attribute instance to its group
-      groups[name].instances.push(attr);
+        // Add this attribute instance to its group
+        groups[name].instances.push(attr);
 
-      return groups;
-    }, {} as Record<string, { name: string; type: string; instances: typeof product.attributes }>);
+        return groups;
+      },
+      {} as Record<
+        string,
+        { name: string; type: string; instances: typeof product.attributes }
+      >,
+    );
 
   // Initialize selected attributes when product changes
   useEffect(() => {
@@ -119,14 +125,14 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
           group.instances[0].items &&
           group.instances[0].items.length > 0 &&
           !group.instances.some(
-            (attr) => selectedAttributes[attr.id || group.type]
-          )
+            (attr) => selectedAttributes[attr.id || group.type],
+          ),
       )
       .map((group) => group.name);
 
     if (unselectedTypes.length > 0) {
       toast.error(
-        `Please select ${unselectedTypes.join(", ")} for ${product.name}`
+        `Please select ${unselectedTypes.join(", ")} for ${product.name}`,
       );
       return;
     }
@@ -138,7 +144,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
     Object.entries(selectedAttributes).forEach(([key, value]) => {
       // Find the attribute this selection belongs to
       const attributeType = Object.values(groupedAttributes).find((group) =>
-        group.instances.some((attr) => (attr.id || group.type) === key)
+        group.instances.some((attr) => (attr.id || group.type) === key),
       );
 
       if (attributeType) {
@@ -183,17 +189,16 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
   };
   const sanitizedDescription = DOMPurify.sanitize(product.description || "");
   const areAllAttributesSelected = () => {
-    const unselectedTypes = Object.values(groupedAttributes)
-      .filter(
-        (group) =>
-          group.instances.length > 0 &&
-          group.instances[0].items &&
-          group.instances[0].items.length > 0 &&
-          !group.instances.some(
-            (attr) => selectedAttributes[attr.id || group.type]
-          )
-      );
-    
+    const unselectedTypes = Object.values(groupedAttributes).filter(
+      (group) =>
+        group.instances.length > 0 &&
+        group.instances[0].items &&
+        group.instances[0].items.length > 0 &&
+        !group.instances.some(
+          (attr) => selectedAttributes[attr.id || group.type],
+        ),
+    );
+
     return unselectedTypes.length === 0;
   };
   return (
@@ -266,7 +271,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
                 <button
                   onClick={() =>
                     setSelectedImage((prev) =>
-                      prev > 0 ? prev - 1 : (product.images?.length || 1) - 1
+                      prev > 0 ? prev - 1 : (product.images?.length || 1) - 1,
                     )
                   }
                   className="rounded-sm p-2 shadow-md cursor-pointer"
@@ -280,7 +285,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
                 <button
                   onClick={() =>
                     setSelectedImage((prev) =>
-                      prev < (product.images?.length || 1) - 1 ? prev + 1 : 0
+                      prev < (product.images?.length || 1) - 1 ? prev + 1 : 0,
                     )
                   }
                   className="rounded-sm p-2 shadow-md cursor-pointer"

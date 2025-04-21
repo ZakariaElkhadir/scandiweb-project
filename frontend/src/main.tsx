@@ -7,16 +7,16 @@ const apiUrl = import.meta.env.PROD
   ? `${import.meta.env.VITE_BACKEND_URL}/graphql`
   : "/graphql";
 
-console.log("Using GraphQL endpoint:", apiUrl); 
+console.log("Using GraphQL endpoint:", apiUrl);
 const client = new ApolloClient({
   uri: apiUrl,
   cache: new InMemoryCache(),
-  credentials: "include", 
+  credentials: "include",
 });
 createRoot(document.getElementById("root")!).render(
   <ApolloProvider client={client}>
     <StrictMode>
       <App />
     </StrictMode>
-  </ApolloProvider>
+  </ApolloProvider>,
 );

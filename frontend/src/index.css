@@ -1,10 +1,19 @@
 @import "tailwindcss";
 
-body, h1, h2, h3, h4, h5, h6, p, ul, ol {
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul,
+ol {
   margin: 0;
   padding: 0;
 }
- @layer base {
+@layer base {
   h3 {
     @apply text-lg font-semibold mb-2;
   }
@@ -44,7 +53,8 @@ body, h1, h2, h3, h4, h5, h6, p, ul, ol {
   @apply text-sm mb-4 text-gray-600;
 }
 
-.prose ul, .prose ol {
+.prose ul,
+.prose ol {
   @apply pl-5 mb-4;
 }
 

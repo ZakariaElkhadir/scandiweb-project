@@ -65,7 +65,7 @@ const generateCartItemId = (item: CartItem): string => {
 
   // Find all selected attribute properties
   const attributeProps = Object.keys(item).filter(
-    (key) => key.startsWith("selected") && item[key]
+    (key) => key.startsWith("selected") && item[key],
   );
 
   // Sort to ensure consistent ID generation
@@ -103,7 +103,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 
       // Find if we already have this item with the same attributes
       const existingItemIndex = state.items.findIndex(
-        (item) => item.cartItemId === newItem.cartItemId
+        (item) => item.cartItemId === newItem.cartItemId,
       );
 
       if (existingItemIndex !== -1) {
@@ -158,7 +158,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
       // Check if we already have an item with these exact attributes
       const duplicateItem = state.items.find(
         (item) =>
-          item.cartItemId === updatedItem.cartItemId && item !== itemToUpdate
+          item.cartItemId === updatedItem.cartItemId && item !== itemToUpdate,
       );
 
       if (duplicateItem) {

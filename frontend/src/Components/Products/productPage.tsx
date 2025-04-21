@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
-import { gql, useQuery } from '@apollo/client';
-import ProductDetails from './productDetails';
+import { gql, useQuery } from "@apollo/client";
+import ProductDetails from "./productDetails";
 
 const GET_PRODUCT_DETAILS = gql`
   query GetProductDetails($id: String!) {
@@ -30,32 +30,32 @@ const GET_PRODUCT_DETAILS = gql`
 
 /**
  * Component: ProductPage
- * 
+ *
  * This component is responsible for displaying the details of a specific product.
  * It fetches the product data based on the `id` parameter from the URL using the `useParams` hook
  * and the `useQuery` hook with the `GET_PRODUCT_DETAILS` GraphQL query.
- * 
+ *
  * @returns {JSX.Element} The product details page or a loading/error state.
- * 
+ *
  * ## Behavior:
  * - If the data is still loading, a loading spinner is displayed.
  * - If an error occurs during the data fetching, an error message is displayed.
  * - Once the data is successfully fetched, the `ProductDetails` component is rendered with the product data.
- * 
+ *
  * ## Dependencies:
  * - `useParams` from `react-router-dom` to extract the `id` parameter from the URL.
  * - `useQuery` from `@apollo/client` to fetch product details using GraphQL.
  * - `ProductDetails` component to display the fetched product information.
- * 
+ *
  * ## Loading State:
  * - Displays a spinner with an accessible role (`role="status"`) and a visually hidden loading message (`sr-only`).
- * 
+ *
  * ## Error State:
  * - Displays an error message with the error details.
- * 
+ *
  * ## Props:
  * - No props are passed directly to this component.
- * 
+ *
  * ## Example Usage:
  * ```tsx
  * <Route path="/product/:id" element={<ProductPage />} />
