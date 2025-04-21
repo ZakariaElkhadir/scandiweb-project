@@ -3,6 +3,7 @@ import { useCart } from "../Cart/CartContext";
 import { toast } from "react-toastify";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import parse from "html-react-parser";
+import DOMPurify from 'dompurify';
 
 interface ProductDetailsProps {
   product: {
@@ -171,7 +172,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
       },
     });
   };
-
+  const sanitizedDescription = DOMPurify.sanitize(product.description || '');
   return (
     <div className="flex flex-col md:flex-row gap-4 lg:gap-8 max-w-6xl mx-auto p-4 pt-20">
       {/* Image Gallery - Mobile version (horizontal scroll) */}
@@ -418,7 +419,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
           className="text-xs sm:text-sm prose prose-sm max-w-none text-gray-500 mt-6 overflow-auto"
           data-testid="product-description"
         >
-          {parse(product.description || '')}
+          {parse(sanitizedDescription)}
         </div>
       </div>
     </div>
