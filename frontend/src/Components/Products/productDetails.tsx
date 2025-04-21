@@ -435,18 +435,12 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
         {/* Add to cart button */}
         <button
           className={`w-full py-3 px-4 transition text-sm sm:text-base ${
-            (product.in_stock ?? 0) > 0 &&
-            Object.keys(selectedAttributes).length ===
-              Object.keys(groupedAttributes).length
+            (product.in_stock ?? 0) > 0
               ? "bg-green-500 text-white hover:bg-green-600"
               : "bg-gray-400 text-gray-700 cursor-not-allowed"
           }`}
           data-testid="add-to-cart"
-          disabled={
-            (product.in_stock ?? 0) <= 0 ||
-            Object.keys(selectedAttributes).length !==
-              Object.keys(groupedAttributes).length
-          }
+          disabled={(product.in_stock ?? 0) <= 0}
           onClick={handleAddToCart}
         >
           {(product.in_stock ?? 0) > 0 ? "ADD TO CART" : "OUT OF STOCK"}
