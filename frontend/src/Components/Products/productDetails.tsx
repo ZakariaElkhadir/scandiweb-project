@@ -415,7 +415,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
 
         {/* Product description */}
         <div
-          className="text-xs sm:text-sm prose max-w-none text-gray-500 mt-6 overflow-auto"
+          className="text-xs sm:text-sm prose prose-sm max-w-none text-gray-500 mt-6 overflow-auto"
           data-testid="product-description"
         >
           {parse(product.description || '')}

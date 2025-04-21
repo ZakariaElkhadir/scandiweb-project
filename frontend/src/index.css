@@ -26,5 +26,50 @@ body, h1, h2, h3, h4, h5, h6, p, ul, ol {
   li {
     @apply mb-2;
   }
-  }
- 
+}
+
+.prose h1 {
+  @apply text-xl font-bold mb-4 text-gray-800;
+}
+
+.prose h2 {
+  @apply text-lg font-bold mb-3 text-gray-800;
+}
+
+.prose h3 {
+  @apply text-base font-semibold mb-2 text-gray-800;
+}
+
+.prose p {
+  @apply text-sm mb-4 text-gray-600;
+}
+
+.prose ul, .prose ol {
+  @apply pl-5 mb-4;
+}
+
+.prose li {
+  @apply mb-1;
+}
+
+.prose a {
+  @apply text-blue-600 hover:underline;
+}
+
+.prose img {
+  @apply my-4 rounded;
+}
+
+.prose table {
+  @apply w-full border-collapse my-4;
+}
+
+.prose table th,
+.prose table td {
+  @apply border border-gray-300 p-2 text-sm;
+}
+
+/* Make the prose look good in the cart too */
+.cart-description .prose {
+  @apply text-xs;
+}
