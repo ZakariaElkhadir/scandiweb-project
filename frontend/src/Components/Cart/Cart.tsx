@@ -33,7 +33,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
 
   // New state for checkout
   const [isCheckingOut, setIsCheckingOut] = useState(false);
-  const [customerEmail, setCustomerEmail] = useState("zakariazakaria@gamil.com");
+  const [customerEmail, setCustomerEmail] = useState("example@gamil.com");
   const [shippingAddress, setShippingAddress] = useState(
     "california, 1234, USA"
   );
