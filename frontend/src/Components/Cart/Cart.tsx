@@ -1,8 +1,16 @@
 import { useCart } from "./CartContext";
-import { useState } from "react";
 import { toast } from "react-toastify";
+import { useEffect, useState } from "react";
 
 const CartOverlay = ({ onClose }: { onClose: () => void }) => {
+  const [apiEndpoint, setApiEndpoint] = useState("/graphql");
+  useEffect(() => {
+    const endpoint = import.meta.env.PROD
+      ? `${import.meta.env.VITE_BACKEND_URL}/graphql`
+      : "/graphql";
+    setApiEndpoint(endpoint);
+  }, []);
+
   const CREATE_ORDER_MUTATION = `
     mutation CreateOrder($customerEmail: String!, $shippingAddress: String!, $items: [OrderItemInput!]!) {
       createOrder(
@@ -27,13 +35,13 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [customerEmail, setCustomerEmail] = useState("zakaria@gmail.com");
   const [shippingAddress, setShippingAddress] = useState(
-    "123 Morocco Casablanca",
+    "123 Morocco Casablanca"
   );
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
 
   const totalPrice = state.items.reduce(
     (sum, item) => sum + (item.price || 0) * item.quantity,
-    0,
+    0
   );
 
   // Abbreviated size label helper function
@@ -52,7 +60,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
   const handleAttributeChange = (
     itemId: string,
     attributeName: string,
-    value: string,
+    value: string
   ) => {
     dispatch({
       type: "UPDATE_ITEM_ATTRIBUTES",
@@ -72,7 +80,9 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
     if (attributeName === "Capacity") return item.selectedCapacity;
 
     // Handle other attributes by checking the camelCased properties
-    const camelCaseKey = `selected${attributeName.charAt(0).toUpperCase() + attributeName.slice(1)}`;
+    const camelCaseKey = `selected${
+      attributeName.charAt(0).toUpperCase() + attributeName.slice(1)
+    }`;
     return item[camelCaseKey];
   };
 
@@ -112,7 +122,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
     }));
 
     try {
-      const res = await fetch("/graphql", {
+      const res = await fetch(apiEndpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -216,7 +226,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                       }
                       return uniqueAttrs;
                     },
-                    {},
+                    {}
                   )
                 : {};
 
@@ -280,7 +290,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                       const attrNameLower = attrName.toLowerCase();
                       const selectedValue = getSelectedAttributeValue(
                         item,
-                        attrName,
+                        attrName
                       );
 
                       return (
@@ -317,7 +327,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                                       handleAttributeChange(
                                         item.id,
                                         attrName,
-                                        sizeItem.value,
+                                        sizeItem.value
                                       )
                                     }
                                     onMouseEnter={() =>
@@ -331,7 +341,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                                     }
                                   >
                                     {getSizeAbbreviation(
-                                      sizeItem.display_value,
+                                      sizeItem.display_value
                                     )}
                                   </button>
 
@@ -370,7 +380,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                                     handleAttributeChange(
                                       item.id,
                                       attrName,
-                                      colorItem.value,
+                                      colorItem.value
                                     )
                                   }
                                   title={colorItem.display_value}
@@ -401,7 +411,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                                     handleAttributeChange(
                                       item.id,
                                       attrName,
-                                      attrItem.value,
+                                      attrItem.value
                                     )
                                   }
                                 >
@@ -455,8 +465,8 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
               {isCheckingOut
                 ? "Processing..."
                 : showCheckoutForm
-                  ? "Place Order"
-                  : "Checkout"}
+                ? "Place Order"
+                : "Checkout"}
             </button>
           </div>
         </div>
