@@ -203,7 +203,7 @@ The project is deployed using the following platforms:
 
 You can access the live project here:  
 ➡️ **Frontend URL:** [https://scandiweb-test-five.vercel.app/](https://scandiweb-test-five.vercel.app/)  
-➡️ **Backend URL:** [https://scandibackend-fcef480964fb.herokuapp.com/graphql](https://scandibackend-fcef480964fb.herokuapp.com/graphql)  
+➡️ **Backend URL:** [https://scandibackend-fcef480964fb.herokuapp.com](https://scandibackend-fcef480964fb.herokuapp.com)  
 
 ---
 
