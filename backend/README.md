@@ -2,6 +2,8 @@
 
 A PHP-based backend service that provides product and order management functionality through GraphQL APIs.
 
+![Scandiweb Diagram](../README_ASSETS/scandiweb_diagram.png)
+
 ## Project Overview
 
 This backend is designed to serve an e-commerce application with the following features:
