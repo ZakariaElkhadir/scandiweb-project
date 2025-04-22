@@ -1,32 +1,108 @@
-# React + TypeScript + Vite
+# Scandiweb E-Commerce Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is a modern e-commerce storefront built with React, TypeScript, and Vite. It connects to a GraphQL backend to provide a complete shopping experience.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Product Browsing**: Browse products by category (All, Clothes, Tech)
+- **Product Details**: View detailed product information with an image gallery
+- **Attribute Selection**: Select product attributes (size, color, capacity)
+- **Shopping Cart**: Add products to the cart, modify quantities, and manage selections
+- **Checkout Process**: Complete purchases with shipping information
 
-## Expanding the ESLint configuration
+## Technology Stack
+
+- **React 19** with TypeScript
+- **Apollo Client** for GraphQL data fetching
+- **React Router** for navigation
+- **Tailwind CSS** for styling
+- **Vite** for fast development and building
+- **DOMPurify** and **html-react-parser** for safe HTML rendering
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+ and npm/yarn
+
+### Installation
+
+1. Clone the repository:
+  ```bash
+  git clone https://github.com/your-repo/scandiweb-project.git
+  cd scandiweb-project/frontend
+  ```
+
+2. Install dependencies:
+  ```bash
+  npm install
+  ```
+
+3. Create a `.env` file in the root directory with:
+  ```env
+  VITE_BACKEND_URL=http://your-backend-url/graphql
+  ```
+
+### Development
+
+Start the development server:
+```bash
+npm run dev
+```
+
+### Building for Production
+
+Build the project:
+```bash
+npm run build
+```
+
+Preview the production build:
+```bash
+npm run preview
+```
+
+## Project Structure
+
+The project follows a modular structure with separate folders for components, pages, and utilities. API requests are handled using Apollo Client, and styles are managed with Tailwind CSS.
+
+## API Integration
+
+The application connects to a GraphQL backend. In development mode, API requests are proxied through `/graphql` to avoid CORS issues. In production, the `VITE_BACKEND_URL` environment variable is used.
+
+## Deployment
+
+This project is deployed on Vercel. For deployment:
+
+1. Ensure proper environment variables are set.
+2. Configure the build command as:
+  ```bash
+  npm run build
+  ```
+3. Set the output directory to `dist`.
+
+## Original Vite Information
+
+For information about Vite configuration, ESLint setup, and other template-specific details, see the Vite documentation.
+
+---
+
+### Expanding the ESLint Configuration
 
 If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
 ```js
 export default tseslint.config({
   extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
+   ...tseslint.configs.recommendedTypeChecked,
+   ...tseslint.configs.strictTypeChecked,
+   ...tseslint.configs.stylisticTypeChecked,
   ],
   languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-      tsconfigRootDir: import.meta.dirname,
-    },
+   parserOptions: {
+    project: ["./tsconfig.node.json", "./tsconfig.app.json"],
+    tsconfigRootDir: import.meta.dirname,
+   },
   },
 });
 ```
@@ -34,21 +110,17 @@ export default tseslint.config({
 You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
 ```js
-// eslint.config.js
 import reactX from "eslint-plugin-react-x";
 import reactDom from "eslint-plugin-react-dom";
 
 export default tseslint.config({
   plugins: {
-    // Add the react-x and react-dom plugins
-    "react-x": reactX,
-    "react-dom": reactDom,
+   "react-x": reactX,
+   "react-dom": reactDom,
   },
   rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs["recommended-typescript"].rules,
-    ...reactDom.configs.recommended.rules,
+   ...reactX.configs["recommended-typescript"].rules,
+   ...reactDom.configs.recommended.rules,
   },
 });
 ```
