@@ -7,6 +7,8 @@ This is a full-stack e-commerce project built with a React + TypeScript frontend
 ## Table of Contents
 
 - Features  
+- Demo Video  
+- Test Results  
 - Tech Stack  
 - Project Structure  
 - Setup and Installation  
@@ -27,6 +29,22 @@ This is a full-stack e-commerce project built with a React + TypeScript frontend
 - ⚡ **GraphQL API:** Communication between frontend and backend via GraphQL  
 - 💅 **Responsive UI:** Styled with TailwindCSS  
 - 🔧 **Full Stack Architecture:** MySQL + PHP backend, React + TypeScript frontend  
+
+---
+
+## Demo Video
+
+A quick demo of the project is available below:
+
+![Demo Video](README_ASSETS/demo_video.mp4)
+
+---
+
+## Test Results
+
+The project has successfully passed all tests. Below is a screenshot of the test results:
+
+![Test Results](README_ASSETS/scandi_tests.png)
 
 ---
 
@@ -178,4 +196,3 @@ You can extend the configuration to include more strict or type-aware rules.
 ## License
 
 MIT License – feel free to use and modify!
-
