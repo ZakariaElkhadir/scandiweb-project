@@ -18,6 +18,7 @@ This is a full-stack e-commerce project built with a React + TypeScript frontend
 - Development Notes  
 - Linting & Code Quality  
 - Future Improvements  
+- Deployment  
 
 ---
 
@@ -190,6 +191,19 @@ You can extend the configuration to include more strict or type-aware rules.
 - [ ] Add authentication & user orders  
 - [ ] Improve backend architecture with MVC patterns  
 - [ ] Implement unit testing  
+
+---
+
+## Deployment
+
+The project is deployed using the following platforms:
+
+- **Frontend:** Deployed on Vercel  
+- **Backend:** Hosted with JAWS DB and deployed via Heroku  
+
+You can access the live project here:  
+➡️ **Frontend URL:** [https://scandiweb-test-five.vercel.app/](https://scandiweb-test-five.vercel.app/)  
+➡️ **Backend URL:** [https://scandibackend-fcef480964fb.herokuapp.com/graphql](https://scandibackend-fcef480964fb.herokuapp.com/graphql)  
 
 ---
 
