@@ -85,6 +85,29 @@ This project is deployed on Vercel. For deployment:
 
 For information about Vite configuration, ESLint setup, and other template-specific details, see the Vite documentation.
 
+## ⚠️ Note on Product Images (Jacket Category)
+During implementation, I encountered a technical limitation affecting some product images — specifically those under the "Jackets" category.
+
+The issue arises because the image URLs (e.g. from Canada Goose) are served from a third-party CDN with strict cross-origin policies, such as:
+
+Cross-Origin-Resource-Policy: same-origin
+
+Content-Security-Policy: frame-ancestors 'none'
+
+These headers prevent the images from being embedded via <img> tags on external domains — even though the images work when accessed directly in the browser.
+
+### 🛠️ Steps Taken
+Confirmed image URLs are valid and accessible directly.
+
+Used browser DevTools to trace the issue back to CORS and CSP restrictions.
+
+Explored solutions on both frontend and backend, but due to the CDN headers, this behavior cannot be bypassed programmatically.
+
+### ✅ Implemented Solution
+To ensure a smooth user experience and proper UI rendering, I implemented a fallback image mechanism in the React frontend. If a product image fails to load (due to CORS/CSP restrictions or otherwise), a local placeholder image is displayed instead.
+
+This allows the application to remain functional and visually consistent, even when external image sources are restricted.
+
 ---
 
 ### Expanding the ESLint Configuration
