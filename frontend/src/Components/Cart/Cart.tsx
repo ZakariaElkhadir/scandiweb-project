@@ -308,7 +308,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                             {attrNameLower === "size" &&
                               attr.items.map((sizeItem: any, index: number) => (
                                 <div key={sizeItem.value} className="relative">
-                                  <button
+                                  <div
                                     data-testid={
                                       selectedValue === sizeItem.value
                                         ? `cart-itemattribute-size-${sizeItem.value
@@ -318,18 +318,11 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                                             .toLowerCase()
                                             .replace(/\s+/g, "-")}`
                                     }
-                                    className={`w-6 h-6 flex items-center justify-center border text-xs ${
+                                    className={`w-6 h-6 flex items-center justify-center border text-xs cursor-default ${
                                       selectedValue === sizeItem.value
                                         ? "border-black bg-black text-white"
                                         : "border-gray-300"
                                     }`}
-                                    onClick={() =>
-                                      handleAttributeChange(
-                                        item.id,
-                                        attrName,
-                                        sizeItem.value
-                                      )
-                                    }
                                     onMouseEnter={() =>
                                       setHoveredSizeIndex({
                                         itemId: item.id,
@@ -343,7 +336,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                                     {getSizeAbbreviation(
                                       sizeItem.display_value
                                     )}
-                                  </button>
+                                  </div>
 
                                   {/* Tooltip */}
                                   {hoveredSizeIndex?.itemId === item.id &&
@@ -359,7 +352,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                             {/* For Color attributes */}
                             {attrNameLower === "color" &&
                               attr.items.map((colorItem: any) => (
-                                <button
+                                <div
                                   key={colorItem.value}
                                   data-testid={
                                     selectedValue === colorItem.value
@@ -370,19 +363,12 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                                           .toLowerCase()
                                           .replace(/\s+/g, "-")}`
                                   }
-                                  className={`w-5 h-5 rounded-sm ${
+                                  className={`w-5 h-5 rounded-sm cursor-default ${
                                     selectedValue === colorItem.value
                                       ? "ring-1 ring-black ring-offset-1"
                                       : ""
                                   }`}
                                   style={{ backgroundColor: colorItem.value }}
-                                  onClick={() =>
-                                    handleAttributeChange(
-                                      item.id,
-                                      attrName,
-                                      colorItem.value
-                                    )
-                                  }
                                   title={colorItem.display_value}
                                 />
                               ))}
@@ -391,7 +377,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                             {attrNameLower !== "size" &&
                               attrNameLower !== "color" &&
                               attr.items.map((attrItem: any) => (
-                                <button
+                                <div
                                   key={attrItem.value}
                                   data-testid={
                                     selectedValue === attrItem.value
@@ -402,21 +388,14 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                                           .toLowerCase()
                                           .replace(/\s+/g, "-")}`
                                   }
-                                  className={`px-2 py-1 border text-xs ${
+                                  className={`px-2 py-1 border text-xs cursor-default ${
                                     selectedValue === attrItem.value
                                       ? "border-black bg-black text-white"
                                       : "border-gray-300"
                                   }`}
-                                  onClick={() =>
-                                    handleAttributeChange(
-                                      item.id,
-                                      attrName,
-                                      attrItem.value
-                                    )
-                                  }
                                 >
                                   {attrItem.display_value}
-                                </button>
+                                </div>
                               ))}
                           </div>
                         </div>
