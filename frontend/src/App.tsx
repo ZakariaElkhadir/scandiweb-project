@@ -32,7 +32,7 @@ function App() {
   return (
     <Router>
       <CartProvider>
-        <AppContent />
+        <AppContent setCartOverlayVisible={setCartOverlayVisible} />
         {isCartOverlayVisible && (
           <CartOverlay onClose={() => setCartOverlayVisible(false)} />
         )}
@@ -41,14 +41,17 @@ function App() {
   );
 }
 
-function AppContent() {
+function AppContent({
+  setCartOverlayVisible,
+}: {
+  setCartOverlayVisible: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const [activeCategory, setActiveCategory] = useState("All");
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Update active category when URL changes
   useEffect(() => {
-    const path = location.pathname.substring(1); // Remove leading /
+    const path = location.pathname.substring(1);
     if (path === "all") {
       setActiveCategory("All");
     } else if (path === "clothes") {
@@ -58,7 +61,10 @@ function AppContent() {
     }
   }, [location]);
 
-  // Function to handle category changes and URL updates
+  useEffect(() => {
+    setCartOverlayVisible(false);
+  }, [activeCategory]);
+
   const handleCategoryChange = (category: string) => {
     setActiveCategory(category);
     navigate(`/${category.toLowerCase()}`);

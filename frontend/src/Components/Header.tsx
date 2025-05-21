@@ -28,7 +28,6 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
     return () => window.removeEventListener("resize", handleResize);
   }, [isMobileMenuOpen]);
 
-  // Close overlays when clicking outside
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -40,6 +39,10 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
     document.addEventListener("mousedown", handleOutsideClick);
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, [isMobileMenuOpen]);
+
+  useEffect(() => {
+    setIsCartOpen(false);
+  }, [activeCategory]);
 
   const handleCartClose = () => {
     setIsCartOpen(false);
@@ -72,8 +75,9 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
                   : "category-link"
               }
               onClick={(e) => {
-                e.preventDefault(); // Prevent navigation
+                e.preventDefault();
                 setActiveCategory(category);
+                setIsCartOpen(false);
               }}
             >
               {category}
@@ -86,8 +90,23 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
 
         {/* Logo */}
         <div className="logo mx-auto md:absolute md:left-1/2 md:transform md:-translate-x-1/2">
-          <Link to="/">
+          <Link
+            to="/all"
+            className={`text-gray-700 hover:text-gray-900 uppercase cursor-pointer relative ${
+              activeCategory === "All" ? "font-medium" : ""
+            }`}
+            onClick={(e) => {
+              e.preventDefault();
+              setActiveCategory("All");
+              if (isCartOpen) {
+                setIsCartOpen(false);
+              }
+            }}
+          >
             <img src={logo} alt="Logo" className="h-8 cursor-pointer" />
+            {activeCategory === "All" && (
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-green-500 -mb-2"></div>
+            )}
           </Link>
         </div>
 
@@ -124,8 +143,9 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
                   activeCategory === category ? "font-medium" : ""
                 }`}
                 onClick={(e) => {
-                  e.preventDefault(); // Prevent navigation
+                  e.preventDefault();
                   setActiveCategory(category);
+                  setIsCartOpen(false);
                   setIsMobileMenuOpen(false);
                 }}
               >
