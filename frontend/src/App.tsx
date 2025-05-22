@@ -52,7 +52,7 @@ function AppContent({
 
   useEffect(() => {
     const path = location.pathname.substring(1);
-    if (path === "all") {
+    if (path === "" || path === "all") {
       setActiveCategory("All");
     } else if (path === "clothes") {
       setActiveCategory("Clothes");
@@ -90,10 +90,7 @@ function AppContent({
 
       <main className="container pt-20 mx-auto">
         <Routes>
-          <Route
-            path="/"
-            element={<ProductsSection activeCategory={activeCategory} />}
-          />
+          <Route path="/" element={<ProductsSection activeCategory="All" />} />
           {/* Add routes for categories */}
           <Route
             path="/all"

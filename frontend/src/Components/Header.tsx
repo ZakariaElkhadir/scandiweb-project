@@ -74,6 +74,7 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
                   ? "active-category-link"
                   : "category-link"
               }
+              data-category={`${category.toLowerCase()}`}
               onClick={(e) => {
                 e.preventDefault();
                 setActiveCategory(category);
@@ -91,10 +92,9 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
         {/* Logo */}
         <div className="logo mx-auto md:absolute md:left-1/2 md:transform md:-translate-x-1/2">
           <Link
-            to="/all"
-            className={`text-gray-700 hover:text-gray-900 uppercase cursor-pointer relative ${
-              activeCategory === "All" ? "font-medium" : ""
-            }`}
+            to="/"
+            className="text-gray-700 hover:text-gray-900 uppercase cursor-pointer relative"
+            data-testid="logo-link"
             onClick={(e) => {
               e.preventDefault();
               setActiveCategory("All");
@@ -104,9 +104,6 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
             }}
           >
             <img src={logo} alt="Logo" className="h-8 cursor-pointer" />
-            {activeCategory === "All" && (
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-green-500 -mb-2"></div>
-            )}
           </Link>
         </div>
 
@@ -142,6 +139,7 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
                 className={`text-gray-700 text-xl hover:text-gray-900 uppercase cursor-pointer relative ${
                   activeCategory === category ? "font-medium" : ""
                 }`}
+                data-category={`${category.toLowerCase()}`}
                 onClick={(e) => {
                   e.preventDefault();
                   setActiveCategory(category);
