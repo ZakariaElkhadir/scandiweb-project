@@ -12,7 +12,7 @@ interface ProductDetailsProps {
     images: string[];
     attributes: {
       id?: string;
-      name: string; // Could be null in some cases
+      name: string;
       items: {
         id?: string;
         value: string;
@@ -38,46 +38,33 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
   const [showAllThumbnails, setShowAllThumbnails] = useState(false);
   const { dispatch } = useCart();
 
-  // Filter out invalid attributes and group them by type
   const groupedAttributes = (product.attributes || [])
-    .filter((attr) => attr && attr.name) // Filter out null/undefined attributes or names
-    .reduce(
-      (groups, attr) => {
-        // Safely get the name and convert to lowercase
-        const name = (attr.name || "unknown").toLowerCase();
+    .filter((attr) => attr && attr.name)
+    .reduce((groups, attr) => {
+      const name = (attr.name || "unknown").toLowerCase();
 
-        // If this is a new attribute type, initialize its group
-        if (!groups[name]) {
-          groups[name] = {
-            name: attr.name || "Unknown",
-            type: name,
-            instances: [],
-          };
-        }
+      if (!groups[name]) {
+        groups[name] = {
+          name: attr.name || "Unknown",
+          type: name,
+          instances: [],
+        };
+      }
 
-        // Add this attribute instance to its group
-        groups[name].instances.push(attr);
+      groups[name].instances.push(attr);
 
-        return groups;
-      },
-      {} as Record<
-        string,
-        { name: string; type: string; instances: typeof product.attributes }
-      >,
-    );
+      return groups;
+    }, {} as Record<string, { name: string; type: string; instances: typeof product.attributes }>);
 
-  // Initialize selected attributes when product changes
   useEffect(() => {
     const initialAttributes: Record<string, string> = {};
 
-    // For each attribute type, initialize with first value of first instance
     Object.values(groupedAttributes).forEach((group) => {
       if (
         group.instances.length > 0 &&
         group.instances[0].items &&
         group.instances[0].items.length > 0
       ) {
-        // We use the first instance's ID (if available) or type as the key
         const firstInstance = group.instances[0];
         const key = firstInstance.id || group.type;
         initialAttributes[key] = firstInstance.items[0].value;
@@ -87,9 +74,8 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
     setSelectedAttributes({});
   }, [product.id]);
 
-  // Helper functions
   const getSizeAbbreviation = (displayValue: string): string => {
-    if (!displayValue) return ""; // Handle undefined/null
+    if (!displayValue) return "";
 
     const lowerValue = displayValue.toLowerCase();
     if (lowerValue === "small") return "S";
@@ -102,7 +88,6 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
     return displayValue;
   };
 
-  // Handle attribute selection
   const handleAttributeSelect = (attributeId: string, value: string) => {
     setSelectedAttributes((prev) => ({
       ...prev,
@@ -110,14 +95,11 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
     }));
   };
 
-  // Limit number of thumbnails to show
   const visibleThumbnails = showAllThumbnails
     ? product.images || []
     : (product.images || []).slice(0, 4);
 
-  // Add to cart handler
   const handleAddToCart = () => {
-    // Check if at least one attribute of each type has been selected
     const unselectedTypes = Object.values(groupedAttributes)
       .filter(
         (group) =>
@@ -125,32 +107,28 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
           group.instances[0].items &&
           group.instances[0].items.length > 0 &&
           !group.instances.some(
-            (attr) => selectedAttributes[attr.id || group.type],
-          ),
+            (attr) => selectedAttributes[attr.id || group.type]
+          )
       )
       .map((group) => group.name);
 
     if (unselectedTypes.length > 0) {
       toast.error(
-        `Please select ${unselectedTypes.join(", ")} for ${product.name}`,
+        `Please select ${unselectedTypes.join(", ")} for ${product.name}`
       );
       return;
     }
 
-    // Prepare selections for cart
     const attributeSelections: Record<string, string> = {};
 
-    // Convert selections to the format expected by the cart
     Object.entries(selectedAttributes).forEach(([key, value]) => {
-      // Find the attribute this selection belongs to
       const attributeType = Object.values(groupedAttributes).find((group) =>
-        group.instances.some((attr) => (attr.id || group.type) === key),
+        group.instances.some((attr) => (attr.id || group.type) === key)
       );
 
       if (attributeType) {
         const type = attributeType.type;
 
-        // Handle special attribute types
         if (type === "size") {
           attributeSelections.selectedSize = value;
         } else if (type === "color") {
@@ -158,7 +136,6 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
         } else if (type === "capacity") {
           attributeSelections.selectedCapacity = value;
         } else {
-          // Convert other attribute names to camelCase
           const camelCaseName = `selected${
             attributeType.name.charAt(0).toUpperCase() +
             attributeType.name.slice(1)
@@ -168,10 +145,8 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
       }
     });
 
-    // Show success toast
     toast.success(`${product.name} added to cart successfully!`);
 
-    // Dispatch to cart with all selected attributes
     dispatch({
       type: "ADD_ITEM",
       payload: {
@@ -195,15 +170,15 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
         group.instances[0].items &&
         group.instances[0].items.length > 0 &&
         !group.instances.some(
-          (attr) => selectedAttributes[attr.id || group.type],
-        ),
+          (attr) => selectedAttributes[attr.id || group.type]
+        )
     );
 
     return unselectedTypes.length === 0;
   };
   return (
     <div className="flex flex-col md:flex-row gap-4 lg:gap-8 max-w-6xl mx-auto p-4 pt-20">
-      {/* Image Gallery - Mobile version (horizontal scroll) */}
+      {/* Image Gallery - Mobile version  */}
       <div className="md:hidden w-full mb-4 overflow-x-auto">
         <div className="flex gap-2 pb-2">
           {(product.images || []).map((image, index) => (
@@ -273,7 +248,9 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
                     <button
                       onClick={() =>
                         setSelectedImage((prev) =>
-                          prev > 0 ? prev - 1 : (product.images?.length || 1) - 1,
+                          prev > 0
+                            ? prev - 1
+                            : (product.images?.length || 1) - 1
                         )
                       }
                       className="rounded-sm p-2 shadow-md cursor-pointer z-10"
@@ -287,7 +264,9 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
                     <button
                       onClick={() =>
                         setSelectedImage((prev) =>
-                          prev < (product.images?.length || 1) - 1 ? prev + 1 : 0,
+                          prev < (product.images?.length || 1) - 1
+                            ? prev + 1
+                            : 0
                         )
                       }
                       className="rounded-sm p-2 shadow-md cursor-pointer z-10"
@@ -320,7 +299,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
                 <button
                   onClick={() =>
                     setSelectedImage((prev) =>
-                      prev > 0 ? prev - 1 : (product.images?.length || 1) - 1,
+                      prev > 0 ? prev - 1 : (product.images?.length || 1) - 1
                     )
                   }
                   className="rounded-sm p-2 shadow-md cursor-pointer z-10"
@@ -334,7 +313,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
                 <button
                   onClick={() =>
                     setSelectedImage((prev) =>
-                      prev < (product.images?.length || 1) - 1 ? prev + 1 : 0,
+                      prev < (product.images?.length || 1) - 1 ? prev + 1 : 0
                     )
                   }
                   className="rounded-sm p-2 shadow-md cursor-pointer z-10"
@@ -355,9 +334,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
       <div className="md:w-1/2 lg:w-2/5 space-y-4">
         <h1 className="text-xl sm:text-2xl font-medium">{product.name}</h1>
 
-        {/* Render attribute groups */}
         {Object.values(groupedAttributes).map((group) => {
-          // Skip empty attribute groups
           if (
             !group.instances.length ||
             !group.instances[0].items ||
@@ -366,8 +343,6 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
             return null;
           }
 
-          // Just render first instance of each attribute type
-          // since we want to deduplicate
           const firstInstance = group.instances[0];
           const attributeId = firstInstance.id || group.type;
 
@@ -382,7 +357,6 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
               </p>
 
               <div className="flex flex-wrap gap-2">
-                {/* Size attribute (special styling) */}
                 {group.type === "size" &&
                   firstInstance.items.map((item, index) => (
                     <div
@@ -414,7 +388,6 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
                     </div>
                   ))}
 
-                {/* Color attribute (special styling) */}
                 {group.type === "color" &&
                   firstInstance.items.map((item, index) => (
                     <button
@@ -434,7 +407,6 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
                     />
                   ))}
 
-                {/* Capacity attribute */}
                 {group.type === "capacity" &&
                   firstInstance.items.map((item, index) => (
                     <button
@@ -453,7 +425,6 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
                     </button>
                   ))}
 
-                {/* Other attributes (general styling) */}
                 {group.type !== "size" &&
                   group.type !== "color" &&
                   group.type !== "capacity" &&
@@ -478,7 +449,6 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
           );
         })}
 
-        {/* Price */}
         <div className="mb-4">
           <p className="text-sm font-medium uppercase mb-2">PRICE:</p>
           <p className="text-lg font-medium">
@@ -487,7 +457,6 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
           </p>
         </div>
 
-        {/* Add to cart button */}
         <button
           className={`w-full py-3 px-4 transition text-sm sm:text-base ${
             Boolean(product.in_stock || product.inStock) &&
@@ -504,7 +473,6 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
         >
           ADD TO CART
         </button>
-        {/* Product description */}
         <div
           className="text-xs sm:text-sm prose prose-sm max-w-none text-gray-500 mt-6 overflow-auto"
           data-testid="product-description"

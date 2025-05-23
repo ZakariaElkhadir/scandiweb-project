@@ -56,31 +56,29 @@ const ProductsCard = ({
   const kebabCase = (str: string) => str.toLowerCase().replace(/\s+/g, "-");
 
   return (
-     <Link to={`/product/${id}`} className="block w-full">
+    <Link to={`/product/${id}`} className="block w-full">
       <div
         data-testid={`product-${kebabCase(name)}`}
         className="w-full max-w-[386px] h-[420px] bg-white hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)] transition-shadow flex flex-col p-2 cursor-pointer group mx-auto"
       >
         <div className="relative overflow-visible h-[70%] w-full mb-2 flex items-center justify-center">
           <img
-  src={imageUrl}
-  alt={name}
-  onError={(e) => {
-    e.currentTarget.src = fallbackImage;
-  }}
-  className={`w-full h-full object-contain px-4 pt-4 
+            src={imageUrl}
+            alt={name}
+            onError={(e) => {
+              e.currentTarget.src = fallbackImage;
+            }}
+            className={`w-full h-full object-contain px-4 pt-4 
     group-hover:scale-105 group-hover:px-4 
     transition-all duration-300
     ${inStock === 0 ? "opacity-50 grayscale" : ""}`}
-/>
+          />
 
-          {/* Action buttons that appear on hover */}
           {inStock !== undefined && inStock > 0 && (
             <div
               className="absolute z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300
             right-9 -bottom-6 flex gap-2"
             >
-              {/* View details button for products with attributes */}
               {hasRequiredAttributes ? (
                 <button
                   onClick={(e) => {
@@ -104,7 +102,6 @@ const ProductsCard = ({
             </div>
           )}
 
-          {/* Out of Stock Badge */}
           {inStock === 0 && (
             <span className="uppercase text-2xl text-[#75757a] absolute">
               Out of Stock
@@ -112,9 +109,11 @@ const ProductsCard = ({
           )}
         </div>
 
-          <div className="mt-2">
-          <h4 className="text-lg font-[300] text-[#1D1F22] truncate font-raleway">{name}</h4>
-          <p className="text-ll font-bold text-gray-900 font-raleway">
+        <div className="mt-2 ml-4">
+          <h4 className="text-lg font-[300] text-[#1D1F22] truncate font-raleway">
+            {name}
+          </h4>
+          <p className="text-ll font-bold text-gray-900 font-raleway ">
             {currency}
             {price}
           </p>

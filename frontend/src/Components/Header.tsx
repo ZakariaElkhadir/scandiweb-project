@@ -89,7 +89,6 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
           ))}
         </div>
 
-        {/* Logo */}
         <div className="logo mx-auto md:absolute md:left-1/2 md:transform md:-translate-x-1/2">
           <Link
             to="/"
@@ -107,7 +106,6 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
           </Link>
         </div>
 
-        {/* Cart button */}
         <button
           className="text-gray-700 hover:text-gray-900 cursor-pointer"
           data-testid="cart-btn"
@@ -118,7 +116,6 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
         >
           <div className="flex relative">
             <ShoppingCart />
-            {/* Badge showing number of items */}
             {totalItems > 0 && (
               <div className="absolute -top-1 -right-2 bg-black text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                 {totalItems}
@@ -157,7 +154,6 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
         </div>
       )}
 
-      {/* Cart overlay with backdrop */}
       {isCartOpen && <CartOverlay onClose={handleCartClose} />}
     </header>
   );

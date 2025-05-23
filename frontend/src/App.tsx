@@ -21,11 +21,9 @@ function App() {
   useEffect(() => {
     const handleOpenCartOverlay = () => setCartOverlayVisible(true);
 
-    // Listen for the custom event
     window.addEventListener("openCartOverlay", handleOpenCartOverlay);
 
     return () => {
-      // Cleanup the event listener
       window.removeEventListener("openCartOverlay", handleOpenCartOverlay);
     };
   }, []);
