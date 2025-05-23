@@ -19,7 +19,7 @@ interface ProductProps {
 }
 
 /**
- * A React functional component that renders a product card with details such as name, price, image, and stock status.
+ * A  functional component that renders a product card with details such as name, price, image, and stock status.
  * The card includes hover effects, action buttons, and conditional rendering based on product attributes and stock availability.
  *
  * @param {ProductProps} props - The properties passed to the component.
@@ -49,92 +49,53 @@ const ProductsCard = ({
   currency,
   attributes = [],
 }: ProductProps) => {
-  // Check if product has attributes that require selection (like size or color)
   const hasRequiredAttributes = attributes.some(
-    (attr) => ["Size", "Color"].includes(attr.name) && attr.items.length > 0,
+    (attr) => ["Size", "Color"].includes(attr.name) && attr.items.length > 0
   );
-
-  // const handleAddToCart = (e: React.MouseEvent) => {
-  //   e.preventDefault();
-  //   e.stopPropagation();
-  //   const numericPrice = parseFloat(price.replace(/[^0-9.]/g, ""));
-  //   const resolvedCurrency = currency || "USD"; // Provide a default currency if undefined
-
-  //   dispatch({
-  //     type: "ADD_ITEM",
-  //     payload: {
-  //       id,
-  //       name,
-  //       image: imageUrl,
-  //       price: numericPrice,
-  //       currency: resolvedCurrency,
-  //       quantity: 1,
-  //     },
-  //   });
-
-  //   if (hasRequiredAttributes) {
-  //     toast.info(`Please select options for ${name}`);
-
-  //     return;
-  //   }
-
-  //   // Check if toast is initialized and use a try-catch to handle errors
-  //   try {
-  //     toast.success(`${name} added to cart!`, {
-  //       position: "bottom-right",
-  //       autoClose: 3000,
-  //       hideProgressBar: false,
-  //       closeOnClick: true,
-  //       pauseOnHover: true,
-  //       draggable: true,
-  //     });
-  //   } catch (error) {
-  //     console.log(`Toast notification failed: ${name} added to cart!`);
-  //   }
-  // };
 
   const kebabCase = (str: string) => str.toLowerCase().replace(/\s+/g, "-");
 
   return (
-    <Link to={`/product/${id}`} className="block">
+     <Link to={`/product/${id}`} className="block w-full">
       <div
         data-testid={`product-${kebabCase(name)}`}
-        className="w-64 h-72 bg-white shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col p-2 cursor-pointer group"
+        className="w-full max-w-[386px] h-[420px] bg-white hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)] transition-shadow flex flex-col p-2 cursor-pointer group mx-auto"
       >
-        <div className="relative overflow-visible h-48 w-full mb-3 flex items-center justify-center">
+        <div className="relative overflow-visible h-[70%] w-full mb-2 flex items-center justify-center">
           <img
-            src={imageUrl}
-            alt={name}
-            onError={(e) => {
-              e.currentTarget.src = fallbackImage; // Local fallback image
-            }}
-            className={`w-full h-full object-contain group-hover:scale-105 transition-transform duration-300
-              ${inStock === 0 ? "opacity-50 grayscale" : ""}`}
-          />
+  src={imageUrl}
+  alt={name}
+  onError={(e) => {
+    e.currentTarget.src = fallbackImage;
+  }}
+  className={`w-full h-full object-contain px-4 pt-4 
+    group-hover:scale-105 group-hover:px-4 
+    transition-all duration-300
+    ${inStock === 0 ? "opacity-50 grayscale" : ""}`}
+/>
 
           {/* Action buttons that appear on hover */}
           {inStock !== undefined && inStock > 0 && (
             <div
               className="absolute z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300
-                right-9 -bottom-6 flex gap-2"
+            right-9 -bottom-6 flex gap-2"
             >
               {/* View details button for products with attributes */}
               {hasRequiredAttributes ? (
                 <button
                   onClick={(e) => {
-                    e.preventDefault(); // the Link handle navigation
+                    e.preventDefault();
                   }}
                   className="bg-blue-500 hover:bg-blue-600 text-white
-                       rounded-full w-10 h-10 flex items-center justify-center shadow-lg"
+               rounded-full w-10 h-10 flex items-center justify-center shadow-lg"
                   aria-label="View details"
                 >
                   <Maximize className="w-5 h-5" strokeWidth={1.5} />
                 </button>
               ) : (
-                /* Add to cart button for products without required attributes */
                 <button
                   className="bg-green-500 hover:bg-green-600 text-white
-                       rounded-full w-10 h-10 flex items-center justify-center shadow-lg"
+               rounded-full w-10 h-10 flex items-center justify-center shadow-lg"
                   aria-label="Add to cart"
                 >
                   <ShoppingCart className="w-5 h-5" strokeWidth={1.5} />
@@ -145,17 +106,15 @@ const ProductsCard = ({
 
           {/* Out of Stock Badge */}
           {inStock === 0 && (
-            <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 text-white px-2 py-1 rounded">
+            <span className="uppercase text-2xl text-[#75757a] absolute">
               Out of Stock
             </span>
           )}
         </div>
 
-        <div className="mt-auto">
-          <h4 className="text-lg font-medium text-gray-800 mb-1 truncate">
-            {name}
-          </h4>
-          <p className="text-xl font-bold text-gray-900">
+          <div className="mt-2">
+          <h4 className="text-lg font-[300] text-[#1D1F22] truncate font-raleway">{name}</h4>
+          <p className="text-ll font-bold text-gray-900 font-raleway">
             {currency}
             {price}
           </p>

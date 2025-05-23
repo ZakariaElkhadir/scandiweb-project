@@ -41,7 +41,6 @@ const ProductsSection = ({ activeCategory }: ProductsSectionProps) => {
   `;
   const { loading, error, data } = useQuery<GetProductsData>(GET_PRODUCTS);
 
-  //--- Loading State ---
   if (loading) {
     return (
       <div
@@ -69,7 +68,6 @@ const ProductsSection = ({ activeCategory }: ProductsSectionProps) => {
     );
   }
 
-  // --- Error State ---
   if (error) {
     console.error("Error fetching products:", error);
     return (
@@ -88,24 +86,25 @@ const ProductsSection = ({ activeCategory }: ProductsSectionProps) => {
       ? products
       : products.filter(
           (product) =>
-            product.category_name.toLowerCase() ===
-            activeCategory.toLowerCase(),
+            product.category_name.toLowerCase() === activeCategory.toLowerCase()
         );
 
   return (
-    <section className="px-4 sm:px-6 md:px-8 lg:px-16 xl:px-22 mt-16 pb-12">
+    <section className="px-4 sm:px-6 md:px-8 lg:px-16 xl:px-20 2xl:px-24 mt-16 pb-12 max-w-screen-2xl mx-auto">
       <h2 className="text-xl sm:text-2xl capitalize font-medium pt-4">
         {activeCategory}
       </h2>
 
-      <div className="mt-6 sm:mt-9 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 justify-items-center sm:justify-items-start">
+      <div className="mt-6 sm:mt-9 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10 sm:gap-x-8 sm:gap-y-12 justify-items-center">
         {filteredProducts.length > 0
           ? filteredProducts.map((product) => (
               <ProductsCard
                 key={product.id}
                 id={product.id.toString()}
                 name={product.name}
-                price={`${product.currency.symbol}${Number(product.price).toFixed(2)}`}
+                price={`${product.currency.symbol}${Number(
+                  product.price
+                ).toFixed(2)}`}
                 imageUrl={product.images?.[0] ?? "default.jpg"}
                 inStock={Number(product.in_stock)}
               />

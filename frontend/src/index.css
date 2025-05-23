@@ -13,6 +13,9 @@ ol {
   margin: 0;
   padding: 0;
 }
+body {
+  font-family: 'Raleway', sans-serif;
+}
 @layer base {
   h3 {
     @apply text-lg font-semibold mb-2;
