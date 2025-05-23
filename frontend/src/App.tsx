@@ -1,4 +1,10 @@
 import Header from "./Components/Header";
+
+declare global {
+  interface Window {
+    closeCartOverlay?: () => void;
+  }
+}
 import ProductPage from "./Components/Products/productPage";
 import ProductsSection from "./Components/Products/ProductsSection";
 import { useState, useEffect } from "react";
@@ -18,31 +24,48 @@ import CartOverlay from "./Components/Cart/Cart";
 function App() {
   const [isCartOverlayVisible, setCartOverlayVisible] = useState(false);
 
+  const toggleCartOverlay = () => {
+    setCartOverlayVisible((prev) => !prev);
+  };
+
+  const closeCartOverlay = () => {
+    setCartOverlayVisible(false);
+  };
+
   useEffect(() => {
     const handleOpenCartOverlay = () => setCartOverlayVisible(true);
-
     window.addEventListener("openCartOverlay", handleOpenCartOverlay);
+
+    window.closeCartOverlay = closeCartOverlay;
 
     return () => {
       window.removeEventListener("openCartOverlay", handleOpenCartOverlay);
+      window.closeCartOverlay = undefined;
     };
   }, []);
+
   return (
     <Router>
       <CartProvider>
-        <AppContent setCartOverlayVisible={setCartOverlayVisible} />
-        {isCartOverlayVisible && (
-          <CartOverlay onClose={() => setCartOverlayVisible(false)} />
-        )}
+        <AppContent
+          isCartOverlayVisible={isCartOverlayVisible}
+          setCartOverlayVisible={setCartOverlayVisible}
+          toggleCartOverlay={toggleCartOverlay}
+        />
+        {isCartOverlayVisible && <CartOverlay onClose={closeCartOverlay} />}
       </CartProvider>
     </Router>
   );
 }
 
 function AppContent({
+  isCartOverlayVisible,
   setCartOverlayVisible,
+  toggleCartOverlay,
 }: {
+  isCartOverlayVisible: boolean;
   setCartOverlayVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  toggleCartOverlay: () => void;
 }) {
   const [activeCategory, setActiveCategory] = useState("All");
   const location = useLocation();
@@ -84,6 +107,8 @@ function AppContent({
       <Header
         activeCategory={activeCategory}
         setActiveCategory={handleCategoryChange}
+        isCartOpen={isCartOverlayVisible}
+        toggleCart={toggleCartOverlay}
       />
 
       <main className="container pt-20 mx-auto">

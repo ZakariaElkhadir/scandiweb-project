@@ -8,11 +8,17 @@ import { useCart } from "./Cart/CartContext";
 interface HeaderProps {
   activeCategory: string;
   setActiveCategory: (category: string) => void;
+  isCartOpen: boolean;
+  toggleCart: () => void;
 }
 
-const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
+const Header = ({
+  activeCategory,
+  setActiveCategory,
+  isCartOpen,
+  toggleCart,
+}: HeaderProps) => {
   const categories = ["All", "Clothes", "Tech"];
-  const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { state } = useCart();
   const totalItems = state.items.reduce((sum, item) => sum + item.quantity, 0);
@@ -40,13 +46,7 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, [isMobileMenuOpen]);
 
-  useEffect(() => {
-    setIsCartOpen(false);
-  }, [activeCategory]);
-
-  const handleCartClose = () => {
-    setIsCartOpen(false);
-  };
+  // Cart is now managed by App.tsx
 
   return (
     <header className="bg-white h-16 fixed w-full z-20 shadow-sm">
@@ -78,7 +78,10 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
               onClick={(e) => {
                 e.preventDefault();
                 setActiveCategory(category);
-                setIsCartOpen(false);
+                // Use the global closeCartOverlay if it exists
+                if (window.closeCartOverlay) {
+                  window.closeCartOverlay();
+                }
               }}
             >
               {category}
@@ -97,8 +100,8 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
             onClick={(e) => {
               e.preventDefault();
               setActiveCategory("All");
-              if (isCartOpen) {
-                setIsCartOpen(false);
+              if (isCartOpen && window.closeCartOverlay) {
+                window.closeCartOverlay();
               }
             }}
           >
@@ -109,9 +112,7 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
         <button
           className="text-gray-700 hover:text-gray-900 cursor-pointer"
           data-testid="cart-btn"
-          onClick={() => {
-            setIsCartOpen(!isCartOpen);
-          }}
+          onClick={toggleCart}
           aria-label="Shopping cart"
         >
           <div className="flex relative">
@@ -140,7 +141,9 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
                 onClick={(e) => {
                   e.preventDefault();
                   setActiveCategory(category);
-                  setIsCartOpen(false);
+                  if (window.closeCartOverlay) {
+                    window.closeCartOverlay();
+                  }
                   setIsMobileMenuOpen(false);
                 }}
               >
@@ -154,7 +157,7 @@ const Header = ({ activeCategory, setActiveCategory }: HeaderProps) => {
         </div>
       )}
 
-      {isCartOpen && <CartOverlay onClose={handleCartClose} />}
+      {/* Cart overlay is now managed by App.tsx */}
     </header>
   );
 };

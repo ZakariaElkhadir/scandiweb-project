@@ -121,19 +121,28 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
     }
   };
 
+
+
+  // Make sure the event propagation is handled correctly for clicks
+  const handleCartClose = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onClose();
+  };
+
   return (
     <>
       {/* Grey overlay that covers everything except header */}
       <div
         className="fixed inset-0 top-16 z-10"
         style={{ backgroundColor: "rgba(0, 0, 0, 0.25)" }}
-        onClick={onClose}
+        onClick={handleCartClose}
       />
 
       {/* Cart content */}
       <div
         className="fixed top-16 right-0 w-96 bg-white max-h-[calc(100vh-4rem)] p-4 shadow-lg z-20 flex flex-col"
         data-testid="cart-overlay"
+        onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-lg font-semibold mb-4">
           My Bag, {state.items.length}{" "}
@@ -163,46 +172,7 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                 key={item.cartItemId}
                 className="flex gap-4 pb-4 mb-4 border-b border-gray-200"
               >
-                <div className="flex flex-col justify-between">
-                  <button
-                    data-testid="cart-item-amountincrease"
-                    className="w-6 h-6 border border-gray-200 flex items-center justify-center text-lg"
-                    onClick={() =>
-                      dispatch({
-                        type: "UPDATE_ITEM",
-                        payload: {
-                          id: item.id,
-                          cartItemId: item.cartItemId,
-                          quantity: item.quantity + 1,
-                        },
-                      })
-                    }
-                  >
-                    +
-                  </button>
-                  <span
-                    data-testid="cart-item-amount"
-                    className="text-center py-1"
-                  >
-                    {item.quantity}
-                  </span>
-                  <button
-                    data-testid="cart-item-amountdecrease"
-                    className="w-6 h-6 border border-gray-200 flex items-center justify-center text-lg"
-                    onClick={() =>
-                      dispatch({
-                        type: "UPDATE_ITEM",
-                        payload: {
-                          id: item.id,
-                          cartItemId: item.cartItemId,
-                          quantity: Math.max(0, item.quantity - 1),
-                        },
-                      })
-                    }
-                  >
-                    -
-                  </button>
-                </div>
+               
 
                 <div className="flex-1">
                   <h3 className="text-sm font-medium">{item.name}</h3>
@@ -322,7 +292,46 @@ const CartOverlay = ({ onClose }: { onClose: () => void }) => {
                     );
                   })}
                 </div>
-
+ <div className="flex flex-col justify-between">
+                  <button
+                    data-testid="cart-item-amountincrease"
+                    className="w-6 h-6 border border-gray-200 flex items-center justify-center text-lg"
+                    onClick={() =>
+                      dispatch({
+                        type: "UPDATE_ITEM",
+                        payload: {
+                          id: item.id,
+                          cartItemId: item.cartItemId,
+                          quantity: item.quantity + 1,
+                        },
+                      })
+                    }
+                  >
+                    +
+                  </button>
+                  <span
+                    data-testid="cart-item-amount"
+                    className="text-center py-1"
+                  >
+                    {item.quantity}
+                  </span>
+                  <button
+                    data-testid="cart-item-amountdecrease"
+                    className="w-6 h-6 border border-gray-200 flex items-center justify-center text-lg"
+                    onClick={() =>
+                      dispatch({
+                        type: "UPDATE_ITEM",
+                        payload: {
+                          id: item.id,
+                          cartItemId: item.cartItemId,
+                          quantity: Math.max(0, item.quantity - 1),
+                        },
+                      })
+                    }
+                  >
+                    -
+                  </button>
+                </div>
                 <img
                   src={item.image}
                   alt={item.name}
