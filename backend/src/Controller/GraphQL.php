@@ -19,16 +19,16 @@ class GraphQL
             'http://localhost:5173',
             'https://scandiweb-test-five.vercel.app'
         ];
-    
+
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
         if (in_array($origin, $allowedOrigins)) {
             header("Access-Control-Allow-Origin: $origin");
         }
-    
+
         header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
         header("Access-Control-Allow-Methods: POST, OPTIONS");
         header("Access-Control-Allow-Credentials: true");
-    
+
         if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
             http_response_code(204);
             exit();
@@ -85,7 +85,6 @@ class GraphQL
                     ],
 
                     "products" => [
-                        // This returns a list of Product objects (AbstractProduct subclasses)
                         "type" => Type::listOf(
                             new ObjectType([
                                 "name" => "Product",
@@ -99,7 +98,6 @@ class GraphQL
                                     "name" => [
                                         "type" => Type::string(),
                                         "resolve" => function ($root) {
-                                            // Either use getDetails() or direct properties
                                             return $root->getDetails()["name"];
                                         },
                                     ],
@@ -140,25 +138,19 @@ class GraphQL
                                     "images" => [
                                         "type" => Type::listOf(Type::string()),
                                         "resolve" => function ($root) {
-                                            return $root->getDetails()[
-                                                "images"
-                                            ];
+                                            return $root->getDetails()["images"];
                                         },
                                     ],
                                     "category_name" => [
                                         "type" => Type::string(),
                                         "resolve" => function ($root) {
-                                            return $root->getDetails()[
-                                                "category_name"
-                                            ];
+                                            return $root->getDetails()["category_name"];
                                         },
                                     ],
                                     "in_stock" => [
                                         "type" => Type::int(),
                                         "resolve" => function ($root) {
-                                            return $root->getDetails()[
-                                                "in_stock"
-                                            ];
+                                            return $root->getDetails()["in_stock"];
                                         },
                                     ],
                                 ],
@@ -187,7 +179,6 @@ class GraphQL
                         "args" => [
                             "customerEmail" => Type::nonNull(Type::string()),
                             "shippingAddress" => Type::nonNull(Type::string()),
-                            // Other order details
                             "items" => Type::nonNull(
                                 Type::listOf(
                                     new InputObjectType([
@@ -205,7 +196,6 @@ class GraphQL
                             ),
                         ],
                         "resolve" => function ($root, $args) {
-                            // Create a new order using the Order model
                             $orderModel = new \Models\Order();
                             $orderId = $orderModel->createOrder($args);
 
@@ -219,8 +209,6 @@ class GraphQL
                 ],
             ]);
 
-            // See docs on schema options:
-            // https://webonyx.github.io/graphql-php/schema-definition/#configuration-options
             $schema = new Schema(
                 (new SchemaConfig())
                     ->setQuery(

@@ -1,5 +1,7 @@
 <?php
+
 namespace Models\Products;
+
 /**
  * Class TechProduct
  *
@@ -11,7 +13,6 @@ namespace Models\Products;
  */
 class TechProduct extends AbstractProduct
 {
-    // Any tech-specific fields/methods here
 
     public function getDetails(): array
     {
@@ -29,4 +30,3 @@ class TechProduct extends AbstractProduct
         ];
     }
 }
-?>

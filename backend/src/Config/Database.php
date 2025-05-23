@@ -1,11 +1,14 @@
 <?php
+
 namespace App\Config;
 
-class Database {
+class Database
+{
     private static $instance = null;
     private $connection;
 
-    private function __construct() {
+    private function __construct()
+    {
         $this->connection = new \mysqli(
             $_ENV['DB_HOST'],
             $_ENV['DB_USER'],
@@ -18,11 +21,11 @@ class Database {
         }
     }
 
-    public static function getConnection() {
+    public static function getConnection()
+    {
         if (!self::$instance) {
             self::$instance = new self();
         }
         return self::$instance->connection;
     }
 }
-?>

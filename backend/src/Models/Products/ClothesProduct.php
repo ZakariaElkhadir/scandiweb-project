@@ -1,5 +1,7 @@
 <?php
+
 namespace Models\Products;
+
 /**
  * Class ClothesProduct
  *
@@ -11,7 +13,6 @@ namespace Models\Products;
  */
 class ClothesProduct extends AbstractProduct
 {
-    // Any clothes-specific fields/methods here
 
     public function getDetails(): array
     {
@@ -30,4 +31,3 @@ class ClothesProduct extends AbstractProduct
         ];
     }
 }
-?>

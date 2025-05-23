@@ -1,4 +1,5 @@
 <?php
+
 namespace Models\Products;
 
 
@@ -40,14 +41,13 @@ class Product
         $result = $this->conn->query($query);
         $rows = $result->fetch_all(MYSQLI_ASSOC);
 
-        // Create polymorphic product objects
         $products = [];
         foreach ($rows as $row) {
             error_log(print_r($row, true));
             $products[] = ProductFactory::create($row);
         }
 
-        return $products; // Returns an array of AbstractProduct objects
+        return $products;
     }
     public function getProductDetails(string $productId): ?array
     {
@@ -110,6 +110,4 @@ class Product
             'in_stock' => $row['in_stock'],
         ];
     }
-
-
 }

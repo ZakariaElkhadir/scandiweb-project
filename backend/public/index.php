@@ -43,11 +43,9 @@ $routeInfo = $dispatcher->dispatch(
 
 switch ($routeInfo[0]) {
     case FastRoute\Dispatcher::NOT_FOUND:
-        // ... 404 Not Found
         break;
     case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
         $allowedMethods = $routeInfo[1];
-        // ... 405 Method Not Allowed
         break;
     case FastRoute\Dispatcher::FOUND:
         $handler = $routeInfo[1];

@@ -1,5 +1,7 @@
 <?php
+
 namespace Models\Products;
+
 /**
  * ProductFactory
  *
@@ -12,14 +14,12 @@ class ProductFactory
     private static array $classMap = [
         'tech' => TechProduct::class,
         'clothes' => ClothesProduct::class,
-        // Add more types here, matching your DB category_name
     ];
 
     public static function create(array $row): AbstractProduct
     {
         $type = strtolower($row['category_name'] ?? '');
 
-        // Fallback or exception if the type is not recognized
         if (!isset(self::$classMap[$type])) {
             throw new \RuntimeException('Unknown product type: ' . $type);
         }
@@ -29,7 +29,6 @@ class ProductFactory
             $row['id'] ?? '',
             $row['name'] ?? 'Unknown',
             (float) ($row['price'] ?? 0),
-            // Split images on comma, handle null gracefully
             explode(',', $row['images'] ?? ''),
             $row['category_name'] ?? 'unknown',
             (int) ($row['in_stock'] ?? 0),
@@ -38,4 +37,3 @@ class ProductFactory
         );
     }
 }
-?>

@@ -1,10 +1,13 @@
 <?php
+
 namespace Controller;
 
 use Models\Products\Product;
 
-class ProductsController{
-    public function getAllProduct(){
+class ProductsController
+{
+    public function getAllProduct()
+    {
         $productModel = new Product();
         $products = $productModel->getAllProducts();
 
@@ -12,4 +15,3 @@ class ProductsController{
         echo json_encode($products);
     }
 }
-?>
