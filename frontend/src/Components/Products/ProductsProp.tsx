@@ -77,7 +77,7 @@ const ProductsCard = ({
           {inStock !== undefined && inStock > 0 && (
             <div
               className="absolute z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300
-            right-9 -bottom-6 flex gap-2"
+            right-9 -bottom-2 flex gap-2 "
             >
               {hasRequiredAttributes ? (
                 <button
@@ -92,7 +92,7 @@ const ProductsCard = ({
                 </button>
               ) : (
                 <button
-                  className="bg-green-500 hover:bg-green-600 text-white
+                  className="bg-green-500 hover:bg-green-600 text-white 
                rounded-full w-10 h-10 flex items-center justify-center shadow-lg"
                   aria-label="Add to cart"
                 >
