@@ -1,8 +1,5 @@
 <?php
-
 namespace Models\Products;
-
-
 use App\Config\Database;
 use Models\Products\ProductFactory;
 
@@ -20,14 +17,16 @@ class Product
     public function __construct()
     {
         $this->conn = Database::getConnection();
+        // GROUP_CONCAT max length to handle long URLs
+        $this->conn->query("SET SESSION group_concat_max_len = 10000");
     }
 
     public function getAllProducts(): array
     {
-        $query = " 
+        $query = "
             SELECT
                 p.*,
-                GROUP_CONCAT(pi.image_url) AS images,
+                GROUP_CONCAT(pi.image_url SEPARATOR '|||') AS images,
                 c.label AS currency,
                 c.symbol AS currency_symbol,
                 pr.amount AS price
@@ -40,8 +39,8 @@ class Product
 
         $result = $this->conn->query($query);
         $rows = $result->fetch_all(MYSQLI_ASSOC);
-
         $products = [];
+
         foreach ($rows as $row) {
             error_log(print_r($row, true));
             $products[] = ProductFactory::create($row);
@@ -49,12 +48,13 @@ class Product
 
         return $products;
     }
+
     public function getProductDetails(string $productId): ?array
     {
         $query = "
         SELECT
             p.*,
-            GROUP_CONCAT(pi.image_url) AS images,
+            GROUP_CONCAT(pi.image_url SEPARATOR '|||') AS images,
             c.label AS currency,
             c.symbol AS currency_symbol,
             pr.amount AS price,
@@ -86,7 +86,7 @@ class Product
     ";
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param('s', $productId);
+        $stmt->bind_param("s", $productId);
         $stmt->execute();
         $result = $stmt->get_result();
         $row = $result->fetch_assoc();
@@ -96,18 +96,18 @@ class Product
         }
 
         return [
-            'id' => $row['id'],
-            'name' => $row['name'],
-            'description' => $row['description'],
-            'brand' => $row['brand_name'],
-            'price' => $row['price'],
-            'currency' => [
-                'label' => $row['currency'],
-                'symbol' => $row['currency_symbol'],
+            "id" => $row["id"],
+            "name" => $row["name"],
+            "description" => $row["description"],
+            "brand" => $row["brand_name"],
+            "price" => $row["price"],
+            "currency" => [
+                "label" => $row["currency"],
+                "symbol" => $row["currency_symbol"],
             ],
-            'images' => explode(',', $row['images']),
-            'attributes' => json_decode($row['attributes'], true),
-            'in_stock' => $row['in_stock'],
+            "images" => explode("|||", $row["images"]), 
+            "attributes" => json_decode($row["attributes"], true),
+            "in_stock" => $row["in_stock"],
         ];
     }
 }
