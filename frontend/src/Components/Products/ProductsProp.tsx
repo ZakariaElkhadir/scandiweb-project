@@ -59,7 +59,7 @@ const ProductsCard = ({
     <Link to={`/product/${id}`} className="block w-full">
       <div
         data-testid={`product-${kebabCase(name)}`}
-        className="w-full max-w-[386px] h-[420px] bg-white hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)] transition-shadow flex flex-col p-2 cursor-pointer group mx-auto"
+        className="w-full max-w-[386px] h-[444px] bg-white hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)] transition-shadow flex flex-col p-2 cursor-pointer group mx-auto"
       >
         <div className="relative overflow-visible h-[70%] w-full mb-2 flex items-center justify-center">
           <img
@@ -109,7 +109,7 @@ const ProductsCard = ({
           )}
         </div>
 
-        <div className="mt-2 ml-4">
+        <div className="mt-4 ml-4">
           <h4 className="text-lg font-[300] text-[#1D1F22] truncate font-raleway">
             {name}
           </h4>

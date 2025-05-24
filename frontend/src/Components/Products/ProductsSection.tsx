@@ -91,11 +91,11 @@ const ProductsSection = ({ activeCategory }: ProductsSectionProps) => {
 
   return (
     <section className="px-4 sm:px-6 md:px-8 lg:px-16 xl:px-20 2xl:px-24 mt-16 pb-12 max-w-screen-2xl mx-auto">
-      <h2 className="text-xl sm:text-2xl capitalize font-medium pt-4">
-        {activeCategory}
+      <h2 className=" text-2xl md:text-4xl capitalize font-[400] pt-4 ">
+        {activeCategory} 
       </h2>
 
-      <div className="mt-6 sm:mt-9 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10 sm:gap-x-8 sm:gap-y-12 justify-items-center">
+      <div className=" mt-9 md:mt-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10 sm:gap-x-8 sm:gap-y-12 justify-items-center">
         {filteredProducts.length > 0
           ? filteredProducts.map((product) => (
               <ProductsCard
