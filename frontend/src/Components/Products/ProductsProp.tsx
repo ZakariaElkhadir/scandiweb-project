@@ -59,17 +59,16 @@ const ProductsCard = ({
     <Link to={`/product/${id}`} className="block w-full">
       <div
         data-testid={`product-${kebabCase(name)}`}
-        className="w-full max-w-[386px] h-[444px] bg-white hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)] transition-shadow flex flex-col p-2 cursor-pointer group mx-auto"
+        className="w-full max-w-[386px] h-[444px] bg-white hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)] transition-shadow flex flex-col p-4 cursor-pointer group mx-auto"
       >
-        <div className="relative overflow-visible h-[70%] w-full mb-2 flex items-center justify-center">
-          <img
+        <div className="relative overflow-visible h-[75%] w-full mb-4 flex items-center justify-center">
+           <img
             src={imageUrl}
             alt={name}
             onError={(e) => {
               e.currentTarget.src = fallbackImage;
             }}
-            className={`w-full h-full object-contain px-4 pt-4 
-    group-hover:scale-105 group-hover:px-4 
+            className={`w-full h-full object-cover px-4   
     transition-all duration-300
     ${inStock === 0 ? "opacity-50 grayscale" : ""}`}
           />
@@ -77,7 +76,7 @@ const ProductsCard = ({
           {inStock !== undefined && inStock > 0 && (
             <div
               className="absolute z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300
-            right-9 -bottom-2 flex gap-2 "
+            right-6 -bottom-2 flex gap-2 "
             >
               {hasRequiredAttributes ? (
                 <button
@@ -109,11 +108,11 @@ const ProductsCard = ({
           )}
         </div>
 
-        <div className="mt-4 ml-4">
-          <h4 className="text-lg font-[300] text-[#1D1F22] truncate font-raleway">
+        <div className="flex-1 px-2 pt-2 pb-1">
+          <h4 className="text-lg font-[300] text-[#1D1F22] truncate font-raleway mb-2">
             {name}
           </h4>
-          <p className="text-ll font-bold text-gray-900 font-raleway ">
+          <p className="text-lg font-bold text-gray-900 font-raleway">
             {currency}
             {price}
           </p>
