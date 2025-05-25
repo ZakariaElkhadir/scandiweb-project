@@ -59,17 +59,17 @@ const ProductsCard = ({
     <Link to={`/product/${id}`} className="block w-full">
       <div
         data-testid={`product-${kebabCase(name)}`}
-        className="w-full max-w-[386px] h-[444px] bg-white hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)] transition-shadow flex flex-col p-4 cursor-pointer group mx-auto"
+        className="w-full max-w-[386px] h-[444px] bg-white-500 hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)] transition-shadow flex flex-col cursor-pointer group p-2  mx-auto"
       >
-        <div className="relative overflow-visible h-[75%] w-full mb-4 flex items-center justify-center">
+        <div className="relative overflow-visible h-[75%] w-full mb-4 flex items-center justify-center mt-4">
            <img
             src={imageUrl}
             alt={name}
             onError={(e) => {
               e.currentTarget.src = fallbackImage;
             }}
-            className={`w-full h-full object-cover px-4   
-    transition-all duration-300
+            className={`w-full h-full object-cover   
+    transition-all duration-300 m-4
     ${inStock === 0 ? "opacity-50 grayscale" : ""}`}
           />
 
@@ -108,7 +108,7 @@ const ProductsCard = ({
           )}
         </div>
 
-        <div className="flex-1 px-2 pt-2 pb-1">
+        <div className="flex-1 px-[0.7rem] pt-2 pb-1">
           <h4 className="text-lg font-[300] text-[#1D1F22] truncate font-raleway mb-2">
             {name}
           </h4>
