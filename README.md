@@ -78,7 +78,6 @@ The project has successfully passed all tests. Below is a screenshot of the test
 │   ├── .env
 │   ├── scandi_db.sql
 │   ├── public/
-│   ├── routes/
 │   ├── src/
 │   └── vendor/
 ```

@@ -85,16 +85,6 @@ This project is deployed on Vercel. For deployment:
 
 For information about Vite configuration, ESLint setup, and other template-specific details, see the Vite documentation.
 
-## ⚠️ Note on Product Images (Jacket Category)
-During implementation, I encountered a technical limitation affecting some product images — specifically those under the "Jackets" category.
-
-The issue arises because the image URLs (e.g. from Canada Goose) are served from a third-party CDN with strict cross-origin policies, such as:
-
-Cross-Origin-Resource-Policy: same-origin
-
-Content-Security-Policy: frame-ancestors 'none'
-
-These headers prevent the images from being embedded via <img> tags on external domains — even though the images work when accessed directly in the browser.
 
 ### 🛠️ Steps Taken
 Confirmed image URLs are valid and accessible directly.

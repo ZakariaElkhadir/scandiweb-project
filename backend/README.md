@@ -51,6 +51,8 @@ Edit the `.env` file with your database configuration.
 - `createOrder` - Create a new order  
 
 To fetch data, always send a POST request to the backend host's `/graphql` endpoint with the appropriate GraphQL query.
+
+## Project Structure
 ### REST API (Testing Only)
 
 This project primarily uses GraphQL for client-server communication. However, a simple REST API is also included for testing purposes:
@@ -58,12 +60,8 @@ This project primarily uses GraphQL for client-server communication. However, a 
 - `GET /api/products` - Get all products (testing only)
 
 > **Note:** The REST endpoints in `routes/routes.php` are not part of the main application flow and are provided only for development and testing purposes. Production applications should use the GraphQL endpoint.
-## Project Structure
-
 ├── public/              # Public directory with entry point
 │   └── index.php        # Main entry point for GraphQL API
-├── routes/              
-│   └── routes.php       # Optional REST API routes (testing only)
 ├── src/                 # Source code
 │   ├── Config/          # Configuration files
 │   ├── Controller/      # Controller classes
