@@ -49,7 +49,7 @@ const Header = ({
   // Cart is now managed by App.tsx
 
   return (
-    <header className="bg-white h-16 fixed w-full z-20 shadow-sm">
+    <header className="bg-white h-16 fixed w-full z-20 ">
       <div className="container mx-auto flex items-center justify-between h-full py-3 px-4 sm:px-6 md:px-8 lg:px-20">
         {/* Mobile hamburger menu */}
         <button
@@ -86,7 +86,7 @@ const Header = ({
             >
               {category}
               {activeCategory === category && (
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-green-500 -mb-2"></div>
+                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 h-1 w-full bg-green-500 -mb-2"></div>
               )}
             </Link>
           ))}
